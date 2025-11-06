@@ -1,10 +1,12 @@
+#https://github.com/SurawutSukkum/Python_YOLOV5_Basler_Opencv/blob/main/HIKrobotTest.py#L688
+
+
 # lib import
 import sys
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout
 from PySide6.QtGui import QPixmap, QImage
 
-from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 from ctypes import *
 from MvCameraControl_class import *
@@ -125,7 +127,7 @@ if __name__ == "__main__":
         print ("start grabbing fail! ret[0x%x]" % ret)
         sys.exit()
 
-    ##################################################
+    ######################################################################################
     # get image
     stOutFrame = MV_FRAME_OUT()  #  переменная выходного фрейм  тип данных
     memset(byref(stOutFrame), 0, sizeof(stOutFrame))  # заполняем всю структуру нулями
@@ -180,13 +182,32 @@ if __name__ == "__main__":
                                      dtype=np.uint8)  # data以流的形式读入转化成ndarray对象
             img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)
             print("color ok!!")
-            print(type(img_buff))
+
+            heightImg, widthImg, channelsImg = img_buff.shape
+            bytes_per_lineImg = channelsImg * widthImg
+            print("heightImg",heightImg)
+            print("widthImg", widthImg)
+            print("bytes_per_lineImg", bytes_per_lineImg)
+            print(img_buff)
+
+            img_mat = cv2.UMat(img_buff)
+            img_rgb = cv2.cvtColor(img_buff, cv2.COLOR_BGR2RGB)
+
+
+            #convert = QImage(img_mat, 400, 400, QImage.Format.Format_BGR888)
+            #frame = QLabel()
+            #frame.setPixmap(QPixmap.fromImage(q_image))
+
+
+
+
 
             # show image
-            cv2.imshow('HLA Label Inspection', img_buff)
+            cv2.imshow('HLA Label Inspection', img_mat)
             cv2.waitKey()
         else:
             print("no data[0x%x]" % ret)
+
 
 
     nRet = cam.MV_CC_FreeImageBuffer(stOutFrame)
@@ -205,7 +226,6 @@ if __name__ == "__main__":
 
 
     app = QApplication(sys.argv)
-
     label = QLabel("Hello World", alignment=Qt.Alignment.AlignCenter)
     label.show()
     sys.exit(app.exec())
