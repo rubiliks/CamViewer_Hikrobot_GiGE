@@ -212,7 +212,7 @@ if __name__ == "__main__":
 
     nRet = cam.MV_CC_FreeImageBuffer(stOutFrame)
 
-    # Close device
+    # Close device аывавыав
     ret = cam.MV_CC_CloseDevice()
     if ret != 0:
         print ("close deivce fail! ret[0x%x]" % ret)
