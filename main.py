@@ -1,7 +1,5 @@
 #https://github.com/SurawutSukkum/Python_YOLOV5_Basler_Opencv/blob/main/HIKrobotTest.py#L688
 
-
-# lib import
 import sys
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout
@@ -53,13 +51,13 @@ def IsImageColor(enType):
 #entry point
 if __name__ == "__main__":
 
+    app = QApplication(sys.argv)
+
     MvCamera.MV_CC_Initialize()
     deviceList = MV_CC_DEVICE_INFO_LIST()
-    tlayerType = (MV_GIGE_DEVICE | MV_USB_DEVICE | MV_GENTL_CAMERALINK_DEVICE
-                  | MV_GENTL_CXP_DEVICE | MV_GENTL_XOF_DEVICE)
 
     # find all cam
-    ret = MvCamera.MV_CC_EnumDevices(tlayerType, deviceList)
+    ret = MvCamera.MV_CC_EnumDevices(MV_GIGE_DEVICE, deviceList)
     if ret != 0:
         print("enum devices fail! ret[0x%x]" % ret)
         sys.exit()
@@ -185,26 +183,23 @@ if __name__ == "__main__":
 
             heightImg, widthImg, channelsImg = img_buff.shape
             bytes_per_lineImg = channelsImg * widthImg
-            print("heightImg",heightImg)
-            print("widthImg", widthImg)
-            print("bytes_per_lineImg", bytes_per_lineImg)
-            print(img_buff)
 
-            img_mat = cv2.UMat(img_buff)
-            img_rgb = cv2.cvtColor(img_buff, cv2.COLOR_BGR2RGB)
+            q_image = QImage(img_buff.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
+            q_pixmap = QPixmap.fromImage(q_image)
 
-
-            #convert = QImage(img_mat, 400, 400, QImage.Format.Format_BGR888)
-            #frame = QLabel()
-            #frame.setPixmap(QPixmap.fromImage(q_image))
-
-
+            label = QLabel()
+            label.setPixmap(q_pixmap)
+            label.show()
 
 
 
             # show image
-            cv2.imshow('HLA Label Inspection', img_mat)
-            cv2.waitKey()
+            #cv2.imshow('HLA Label Inspection', img_buff)
+            #cv2.waitKey()
+
+
+
+            #label.show()
         else:
             print("no data[0x%x]" % ret)
 
@@ -225,7 +220,6 @@ if __name__ == "__main__":
 
 
 
-    app = QApplication(sys.argv)
-    label = QLabel("Hello World", alignment=Qt.Alignment.AlignCenter)
-    label.show()
+
+
     sys.exit(app.exec())
