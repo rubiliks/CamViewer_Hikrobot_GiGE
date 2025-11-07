@@ -2,6 +2,7 @@ import sys
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout
 from PySide6.QtGui import QPixmap, QImage
+from PySide6.QtCore import QTimer
 
 import os
 from ctypes import *
@@ -105,13 +106,60 @@ def _destroy_handle(cam_link):
         print ("destroy handle fail! ret[0x%x]" % ret)
         sys.exit()
 
+def _get_one_frame(cam_link,lable_link):
+    start_time = time.time()
+    stOutFrame = MV_FRAME_OUT()  # переменная выходного фрейм  тип данных
+    memset(byref(stOutFrame), 0, sizeof(stOutFrame))  # заполняем всю структуру нулями
+    ret = cam_link.MV_CC_GetImageBuffer(stOutFrame, 10000)  # читаем из буфера камеры
+    img_buff = None
+    if None != stOutFrame.pBufAddr and 0 == ret:
+        print("MV_CC_GetImageBuffer: Width[%d], Height[%d], nFrameNum[%d]" % (stOutFrame.stFrameInfo.nWidth,
+                                                                              stOutFrame.stFrameInfo.nHeight,
+                                                                              stOutFrame.stFrameInfo.nFrameNum))
+        stConvertParam = MV_CC_PIXEL_CONVERT_PARAM()
+        memset(byref(stConvertParam), 0, sizeof(stConvertParam))
+        stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed  # opecv要用BGR，不能使用RGB
+        nConvertSize = stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3  # размер цветного кадра
+        # convert pixel
+        if img_buff is None:
+            img_buff = (c_ubyte * stOutFrame.stFrameInfo.nFrameLen)()
+        stConvertParam.nWidth = stOutFrame.stFrameInfo.nWidth
+        stConvertParam.nHeight = stOutFrame.stFrameInfo.nHeight
+        stConvertParam.pSrcData = cast(stOutFrame.pBufAddr, POINTER(c_ubyte))
+        stConvertParam.nSrcDataLen = stOutFrame.stFrameInfo.nFrameLen
+        stConvertParam.enSrcPixelType = stOutFrame.stFrameInfo.enPixelType
+        stConvertParam.pDstBuffer = (c_ubyte * nConvertSize)()
+        stConvertParam.nDstBufferSize = nConvertSize
+        ret = cam_link.MV_CC_ConvertPixelType(stConvertParam)  # конвертируем пиксели в правильном порядке
+        if ret != 0:
+            print("convert pixel fail! ret[0x%x]" % ret)
+            del stConvertParam.pSrcData
+            sys.exit()
+        img_buff = (c_ubyte * stConvertParam.nDstLen)()
+        cdll.msvcrt.memcpy(byref(img_buff), stConvertParam.pDstBuffer, stConvertParam.nDstLen)  # копирование данных
+        img_buff = np.frombuffer(img_buff, count=int(stConvertParam.nDstBufferSize),  # преобразование в np массив
+                                 dtype=np.uint8)  # data以流的形式读入转化成ndarray对象
+        img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)
+
+        img_color_rbb = cv2.cvtColor(img_buff, cv2.COLOR_BGR2RGB)
+        heightImg, widthImg, channelsImg = img_color_rbb.shape
+        bytes_per_lineImg = channelsImg * widthImg
+
+        q_image = QImage(img_color_rbb.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
+        q_pixmap = QPixmap.fromImage(q_image)
+        q_pixmap2 = q_pixmap.copy()
 
 
+        nRet = cam_link.MV_CC_FreeImageBuffer(stOutFrame)
 
+        end_time = time.time()
+        execution_time = end_time - start_time
+        fps = 1 / execution_time
+        print(f"Время выполнения: {execution_time:.6f} секунд, FPS: {fps:.6f}")
+        lable_link.setPixmap(q_pixmap2)
+    else:
+        print("no data[0x%x]" % ret)
 
-
-
-#entry point
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     label = QLabel()
@@ -119,12 +167,10 @@ if __name__ == "__main__":
     label.resize(720, 540)
     label.show()
 
-
     cam = MvCamera()
     MvCamera.MV_CC_Initialize()
     nConnectionNum = 0
     deviceList = MV_CC_DEVICE_INFO_LIST()
-
 
     _update_cam_list(cam,deviceList)
 
@@ -138,69 +184,13 @@ if __name__ == "__main__":
     _set_camera_setting(cam)
     _start_grab(cam)
 
-
-    ######################################################################################
-    while True:
-        try:
-            start_time = time.time()
-
-            stOutFrame = MV_FRAME_OUT()  # переменная выходного фрейм  тип данных
-            memset(byref(stOutFrame), 0, sizeof(stOutFrame))  # заполняем всю структуру нулями
-            ret = cam.MV_CC_GetImageBuffer(stOutFrame, 10000)  # читаем из буфера камеры
-            img_buff = None
-            if None != stOutFrame.pBufAddr and 0 == ret:
-                print("MV_CC_GetImageBuffer: Width[%d], Height[%d], nFrameNum[%d]" % (stOutFrame.stFrameInfo.nWidth,
-                                                                                      stOutFrame.stFrameInfo.nHeight,
-                                                                                      stOutFrame.stFrameInfo.nFrameNum))
-                stConvertParam = MV_CC_PIXEL_CONVERT_PARAM()
-                memset(byref(stConvertParam), 0, sizeof(stConvertParam))
-                stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed  # opecv要用BGR，不能使用RGB
-                nConvertSize = stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3  # размер цветного кадра
-                # convert pixel
-                if img_buff is None:
-                    img_buff = (c_ubyte * stOutFrame.stFrameInfo.nFrameLen)()
-                stConvertParam.nWidth = stOutFrame.stFrameInfo.nWidth
-                stConvertParam.nHeight = stOutFrame.stFrameInfo.nHeight
-                stConvertParam.pSrcData = cast(stOutFrame.pBufAddr, POINTER(c_ubyte))
-                stConvertParam.nSrcDataLen = stOutFrame.stFrameInfo.nFrameLen
-                stConvertParam.enSrcPixelType = stOutFrame.stFrameInfo.enPixelType
-                stConvertParam.pDstBuffer = (c_ubyte * nConvertSize)()
-                stConvertParam.nDstBufferSize = nConvertSize
-                ret = cam.MV_CC_ConvertPixelType(stConvertParam) # конвертируем пиксели в правильном порядке
-                if ret != 0:
-                    print("convert pixel fail! ret[0x%x]" % ret)
-                    del stConvertParam.pSrcData
-                    sys.exit()
-                img_buff = (c_ubyte * stConvertParam.nDstLen)()
-                cdll.msvcrt.memcpy(byref(img_buff), stConvertParam.pDstBuffer, stConvertParam.nDstLen) # копирование данных
-                img_buff = np.frombuffer(img_buff, count=int(stConvertParam.nDstBufferSize), # преобразование в np массив
-                                         dtype=np.uint8)  # data以流的形式读入转化成ndarray对象
-                img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)
-
-                img_color_rbb = cv2.cvtColor(img_buff,cv2.COLOR_BGR2RGB)
-                heightImg, widthImg, channelsImg = img_color_rbb.shape
-                bytes_per_lineImg = channelsImg * widthImg
-
-                q_image = QImage(img_color_rbb.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
-                q_pixmap = QPixmap.fromImage(q_image)
-                q_pixmap2 = q_pixmap.copy()
-                label.setPixmap(q_pixmap2)
-
-                nRet = cam.MV_CC_FreeImageBuffer(stOutFrame)
-
-                cv2.waitKey()
-
-                end_time = time.time()
-                execution_time = end_time - start_time
-                fps = 1/execution_time
-                print(f"Время выполнения: {execution_time:.6f} секунд, FPS: {fps:.6f}")
-            else:
-                print("no data[0x%x]" % ret)
-        except Exception as e:
-            print("no data[0x%x]")
+    timer = QTimer()
+    timer.setInterval(10)
+    timer.timeout.connect(lambda:_get_one_frame(cam,label))
+    timer.start()
 
     # Close device
-    _close_cam(cam)
-    _destroy_handle(cam)
+    #_close_cam(cam)
+    #_destroy_handle(cam)
 
     sys.exit(app.exec())
