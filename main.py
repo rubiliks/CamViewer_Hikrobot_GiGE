@@ -13,40 +13,6 @@ import numpy as np
 import cv2
 
 
-def IsImageColor(enType):
-    dates = {
-        PixelType_Gvsp_RGB8_Packed: 'color',
-        PixelType_Gvsp_BGR8_Packed: 'color',
-        PixelType_Gvsp_YUV422_Packed: 'color',
-        PixelType_Gvsp_YUV422_YUYV_Packed: 'color',
-        PixelType_Gvsp_BayerGR8: 'color',
-        PixelType_Gvsp_BayerRG8: 'color',
-        PixelType_Gvsp_BayerGB8: 'color',
-        PixelType_Gvsp_BayerBG8: 'color',
-        PixelType_Gvsp_BayerGB10: 'color',
-        PixelType_Gvsp_BayerGB10_Packed: 'color',
-        PixelType_Gvsp_BayerBG10: 'color',
-        PixelType_Gvsp_BayerBG10_Packed: 'color',
-        PixelType_Gvsp_BayerRG10: 'color',
-        PixelType_Gvsp_BayerRG10_Packed: 'color',
-        PixelType_Gvsp_BayerGR10: 'color',
-        PixelType_Gvsp_BayerGR10_Packed: 'color',
-        PixelType_Gvsp_BayerGB12: 'color',
-        PixelType_Gvsp_BayerGB12_Packed: 'color',
-        PixelType_Gvsp_BayerBG12: 'color',
-        PixelType_Gvsp_BayerBG12_Packed: 'color',
-        PixelType_Gvsp_BayerRG12: 'color',
-        PixelType_Gvsp_BayerRG12_Packed: 'color',
-        PixelType_Gvsp_BayerGR12: 'color',
-        PixelType_Gvsp_BayerGR12_Packed: 'color',
-        PixelType_Gvsp_Mono8: 'mono',
-        PixelType_Gvsp_Mono10: 'mono',
-        PixelType_Gvsp_Mono10_Packed: 'mono',
-        PixelType_Gvsp_Mono12: 'mono',
-        PixelType_Gvsp_Mono12_Packed: 'mono'}
-    return dates.get(enType, '未知')
-
-
 
 #entry point
 if __name__ == "__main__":
@@ -75,7 +41,6 @@ if __name__ == "__main__":
             print("\ngige device: [%d]" % i)
             strModeName = ''.join([chr(c) for c in mvcc_dev_info.SpecialInfo.stGigEInfo.chModelName if c != 0])
             print("device model name: %s" % strModeName)
-
             nip1 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0xff000000) >> 24)
             nip2 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x00ff0000) >> 16)
             nip3 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x0000ff00) >> 8)
@@ -88,6 +53,7 @@ if __name__ == "__main__":
         print("intput error!")
         sys.exit()
 
+    # create cam obj
     cam = MvCamera()
     stDeviceList = cast(deviceList.pDeviceInfo[int(nConnectionNum)], POINTER(MV_CC_DEVICE_INFO)).contents
 
@@ -126,88 +92,74 @@ if __name__ == "__main__":
         sys.exit()
 
     ######################################################################################
+
     # get image
-    stOutFrame = MV_FRAME_OUT()  #  переменная выходного фрейм  тип данных
-    memset(byref(stOutFrame), 0, sizeof(stOutFrame))  # заполняем всю структуру нулями
-    ret = cam.MV_CC_GetImageBuffer(stOutFrame, 1000)  # читаем из буфера камеры
-    img_buff = None
-    if None != stOutFrame.pBufAddr and 0 == ret:
-        print("MV_CC_GetImageBuffer: Width[%d], Height[%d], nFrameNum[%d]" % (stOutFrame.stFrameInfo.nWidth,
-                                                                              stOutFrame.stFrameInfo.nHeight,
-                                                                              stOutFrame.stFrameInfo.nFrameNum))
-        stConvertParam = MV_CC_PIXEL_CONVERT_PARAM()
-        memset(byref(stConvertParam), 0, sizeof(stConvertParam))
-        #check color
-        if IsImageColor(stOutFrame.stFrameInfo.enPixelType) == 'mono':
-            print("mono!")
-            stConvertParam.enDstPixelType = PixelType_Gvsp_Mono8
-            nConvertSize = stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight
-        elif IsImageColor(stOutFrame.stFrameInfo.enPixelType) == 'color':
-            print("color!")
-            stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed  # opecv要用BGR，不能使用RGB
-            nConvertSize = stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3  # размер цветного кадра
-        else:
-            print("not support!!!")
 
-        # convert pixel
-        if img_buff is None:
-            img_buff = (c_ubyte * stOutFrame.stFrameInfo.nFrameLen)()
-        stConvertParam.nWidth = stOutFrame.stFrameInfo.nWidth
-        stConvertParam.nHeight = stOutFrame.stFrameInfo.nHeight
-        stConvertParam.pSrcData = cast(stOutFrame.pBufAddr, POINTER(c_ubyte))
-        stConvertParam.nSrcDataLen = stOutFrame.stFrameInfo.nFrameLen
-        stConvertParam.enSrcPixelType = stOutFrame.stFrameInfo.enPixelType
-        stConvertParam.pDstBuffer = (c_ubyte * nConvertSize)()
-        stConvertParam.nDstBufferSize = nConvertSize
-        ret = cam.MV_CC_ConvertPixelType(stConvertParam) # конвертируем пиксели в правильном порядке
-        if ret != 0:
-            print("convert pixel fail! ret[0x%x]" % ret)
-            del stConvertParam.pSrcData
-            sys.exit()
-        else:
-            print("convert ok!!")
-        if IsImageColor(stOutFrame.stFrameInfo.enPixelType) == 'mono':
-            img_buff = (c_ubyte * stConvertParam.nDstLen)() # создаем буфер изображения из безнаковых байтов
-            cdll.msvcrt.memcpy(byref(img_buff), stConvertParam.pDstBuffer, stConvertParam.nDstLen)
-            img_buff = np.frombuffer(img_buff, count=int(stConvertParam.nDstBufferSize), dtype=np.uint8)
-            img_buff = img_buff.reshape((stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth))
-            print("mono ok!!")
-            image_show(image=img_buff)
-        if IsImageColor(stOutFrame.stFrameInfo.enPixelType) == 'color':
-            img_buff = (c_ubyte * stConvertParam.nDstLen)()
-            cdll.msvcrt.memcpy(byref(img_buff), stConvertParam.pDstBuffer, stConvertParam.nDstLen) # копирование данных
-            img_buff = np.frombuffer(img_buff, count=int(stConvertParam.nDstBufferSize), # преобразование в np массив
-                                     dtype=np.uint8)  # data以流的形式读入转化成ndarray对象
-            img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)
-            print("color ok!!")
+    label = QLabel()
+    label.setWindowTitle("Камера")
+    label.resize(720, 540)
+    label.show()
 
-            heightImg, widthImg, channelsImg = img_buff.shape
-            bytes_per_lineImg = channelsImg * widthImg
+    while True:
+        try:
+            stOutFrame = MV_FRAME_OUT()  # переменная выходного фрейм  тип данных
+            memset(byref(stOutFrame), 0, sizeof(stOutFrame))  # заполняем всю структуру нулями
+            ret = cam.MV_CC_GetImageBuffer(stOutFrame, 10000)  # читаем из буфера камеры
+            img_buff = None
+            if None != stOutFrame.pBufAddr and 0 == ret:
+                print("MV_CC_GetImageBuffer: Width[%d], Height[%d], nFrameNum[%d]" % (stOutFrame.stFrameInfo.nWidth,
+                                                                                      stOutFrame.stFrameInfo.nHeight,
+                                                                                      stOutFrame.stFrameInfo.nFrameNum))
+                stConvertParam = MV_CC_PIXEL_CONVERT_PARAM()
+                memset(byref(stConvertParam), 0, sizeof(stConvertParam))
+                stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed  # opecv要用BGR，不能使用RGB
+                nConvertSize = stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3  # размер цветного кадра
 
-            q_image = QImage(img_buff.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
-            q_pixmap = QPixmap.fromImage(q_image)
+                # convert pixel
+                if img_buff is None:
+                    img_buff = (c_ubyte * stOutFrame.stFrameInfo.nFrameLen)()
+                stConvertParam.nWidth = stOutFrame.stFrameInfo.nWidth
+                stConvertParam.nHeight = stOutFrame.stFrameInfo.nHeight
+                stConvertParam.pSrcData = cast(stOutFrame.pBufAddr, POINTER(c_ubyte))
+                stConvertParam.nSrcDataLen = stOutFrame.stFrameInfo.nFrameLen
+                stConvertParam.enSrcPixelType = stOutFrame.stFrameInfo.enPixelType
+                stConvertParam.pDstBuffer = (c_ubyte * nConvertSize)()
+                stConvertParam.nDstBufferSize = nConvertSize
+                ret = cam.MV_CC_ConvertPixelType(stConvertParam) # конвертируем пиксели в правильном порядке
+                if ret != 0:
+                    print("convert pixel fail! ret[0x%x]" % ret)
+                    del stConvertParam.pSrcData
+                    sys.exit()
 
-            label = QLabel()
-            label.setPixmap(q_pixmap)
-            label.show()
+                img_buff = (c_ubyte * stConvertParam.nDstLen)()
+                cdll.msvcrt.memcpy(byref(img_buff), stConvertParam.pDstBuffer, stConvertParam.nDstLen) # копирование данных
+                img_buff = np.frombuffer(img_buff, count=int(stConvertParam.nDstBufferSize), # преобразование в np массив
+                                         dtype=np.uint8)  # data以流的形式读入转化成ndarray对象
+                img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)
+
+                img_color_rbb = cv2.cvtColor(img_buff,cv2.COLOR_BGR2RGB)
+
+                heightImg, widthImg, channelsImg = img_color_rbb.shape
+                bytes_per_lineImg = channelsImg * widthImg
+
+                q_image = QImage(img_color_rbb.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
+                q_pixmap = QPixmap.fromImage(q_image)
+                q_pixmap2 = q_pixmap.copy()
+                label.setPixmap(q_pixmap2)
+
+                nRet = cam.MV_CC_FreeImageBuffer(stOutFrame)
+                cv2.waitKey()
+
+            else:
+                print("no data[0x%x]" % ret)
+
+        except Exception as e:
+            print("no data[0x%x]")
 
 
 
-            # show image
-            #cv2.imshow('HLA Label Inspection', img_buff)
-            #cv2.waitKey()
 
-
-
-            #label.show()
-        else:
-            print("no data[0x%x]" % ret)
-
-
-
-    nRet = cam.MV_CC_FreeImageBuffer(stOutFrame)
-
-    # Close device аывавыав
+    # Close device
     ret = cam.MV_CC_CloseDevice()
     if ret != 0:
         print ("close deivce fail! ret[0x%x]" % ret)
@@ -217,9 +169,6 @@ if __name__ == "__main__":
     if ret != 0:
         print ("destroy handle fail! ret[0x%x]" % ret)
         sys.exit()
-
-
-
 
 
     sys.exit(app.exec())
