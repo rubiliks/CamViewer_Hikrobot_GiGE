@@ -18,7 +18,6 @@ import cv2
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
-
     MvCamera.MV_CC_Initialize()
     deviceList = MV_CC_DEVICE_INFO_LIST()
 
@@ -84,14 +83,38 @@ if __name__ == "__main__":
     if ret != 0:
         print ("set trigger mode fail! ret[0x%x]" % ret)
         sys.exit()
+    #Set GainAuto as off
+    ret = cam.MV_CC_SetEnumValue("GainAuto", MV_GAIN_MODE_OFF)
+    if ret != 0:
+        print ("set GainAuto mode fail! ret[0x%x]" % ret)
+        sys.exit()
+    # Set BalanceWhiteAuto as off
+    ret = cam.MV_CC_SetEnumValue("BalanceWhiteAuto", MV_BALANCEWHITE_AUTO_OFF)
+    if ret != 0:
+        print ("set GainAuto mode fail! ret[0x%x]" % ret)
+        sys.exit()
+    # Set ExposureAuto  as off
+    ret = cam.MV_CC_SetEnumValue("ExposureAuto", MV_EXPOSURE_AUTO_MODE_OFF)
+    if ret != 0:
+        print ("set ExposureAuto mode fail! ret[0x%x]" % ret)
+        sys.exit()
+    # Set ExposureTime
+    ret = cam.MV_CC_SetFloatValue("ExposureTime", 10000)
+    if ret != 0:
+        print ("set ExposureTime fail! ret[0x%x]" % ret)
+        sys.exit()
+    # Set Gain
+    ret = cam.MV_CC_SetFloatValue("Gain",5.0 )
+    if ret != 0:
+        print ("set Gain fail! ret[0x%x]" % ret)
+        sys.exit()
+
 
     # Start grab image
     ret = cam.MV_CC_StartGrabbing()
     if ret != 0:
         print ("start grabbing fail! ret[0x%x]" % ret)
         sys.exit()
-
-    ######################################################################################
 
     # get image
 
@@ -100,6 +123,7 @@ if __name__ == "__main__":
     label.resize(720, 540)
     label.show()
 
+    ######################################################################################
     while True:
         try:
             stOutFrame = MV_FRAME_OUT()  # переменная выходного фрейм  тип данных
@@ -138,7 +162,6 @@ if __name__ == "__main__":
                 img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)
 
                 img_color_rbb = cv2.cvtColor(img_buff,cv2.COLOR_BGR2RGB)
-
                 heightImg, widthImg, channelsImg = img_color_rbb.shape
                 bytes_per_lineImg = channelsImg * widthImg
 
@@ -156,9 +179,6 @@ if __name__ == "__main__":
         except Exception as e:
             print("no data[0x%x]")
 
-
-
-
     # Close device
     ret = cam.MV_CC_CloseDevice()
     if ret != 0:
@@ -169,6 +189,5 @@ if __name__ == "__main__":
     if ret != 0:
         print ("destroy handle fail! ret[0x%x]" % ret)
         sys.exit()
-
 
     sys.exit(app.exec())
