@@ -13,6 +13,7 @@ import cv2
 import time
 
 x_global = False
+mem_connect = False
 
 def _update_cam_list(cam_link,cam_list_link):
     ret = cam_link.MV_CC_EnumDevices(MV_GIGE_DEVICE, cam_list_link)
@@ -162,13 +163,35 @@ def _get_one_frame(cam_link,lable_link):
             print(f"Время выполнения: {execution_time:.6f} секунд, FPS: {fps:.6f}")
             lable_link.setPixmap(q_pixmap2)
         else:
+            lable_link.clear()
             print("no data[0x%x]" % ret)
-
 
 def _funck():
     global x_global
     x_global = not x_global
+    if x_global == True:
+        print("Start grab image")
+    else:
+        print("Stop Grab")
 
+def _serch_connect_grab(cam,deviceList):
+    global mem_connect
+    if mem_connect == False:
+        _update_cam_list(cam,deviceList)
+        if int(nConnectionNum) >= deviceList.nDeviceNum:
+            print("intput error!")
+            sys.exit()
+        stDeviceList = cast(deviceList.pDeviceInfo[int(nConnectionNum)], POINTER(MV_CC_DEVICE_INFO)).contents
+
+        _create_cam_handle(stDeviceList)
+        _open_cam(cam,stDeviceList)
+        _set_camera_setting(cam)
+        _start_grab(cam)
+        mem_connect = True
+    else:
+        _close_cam(cam)
+        _destroy_handle(cam)
+        mem_connect = False
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -186,8 +209,8 @@ if __name__ == "__main__":
     label.resize(720, 540)
     label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    button_connect = QPushButton("Connect to camera")
-    button_disconect = QPushButton("Disconnect camera")
+    button_connect = QPushButton("Start grab")
+    button_disconect = QPushButton("Connect/disconect camera")
 
     layout.addWidget(label)
     layout.addWidget(button_connect)
@@ -196,32 +219,16 @@ if __name__ == "__main__":
 
     cam = MvCamera()
 
-    #button_connect.clicked.connect(lambda:_close_cam(cam))
-    button_connect.clicked.connect(_funck)
-
     MvCamera.MV_CC_Initialize()
     nConnectionNum = 0
     deviceList = MV_CC_DEVICE_INFO_LIST()
 
-    _update_cam_list(cam,deviceList)
-
-    if int(nConnectionNum) >= deviceList.nDeviceNum:
-        print("intput error!")
-        sys.exit()
-    stDeviceList = cast(deviceList.pDeviceInfo[int(nConnectionNum)], POINTER(MV_CC_DEVICE_INFO)).contents
-
-    _create_cam_handle(stDeviceList)
-    _open_cam(cam,stDeviceList)
-    _set_camera_setting(cam)
-    _start_grab(cam)
+    button_connect.clicked.connect(_funck)
+    button_disconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList))
 
     timer = QTimer()
     timer.setInterval(10)
     timer.timeout.connect(lambda:_get_one_frame(cam,label))
     timer.start()
-
-    # Close device
-    #_close_cam(cam)
-    #_destroy_handle(cam)
 
     sys.exit(app.exec())
