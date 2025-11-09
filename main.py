@@ -4,8 +4,6 @@ from PySide6.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QMainW
 from PySide6.QtGui import QPixmap, QImage
 from PySide6.QtCore import QTimer
 
-import os
-from ctypes import *
 from MvCameraControl_class import *
 
 import numpy as np
@@ -164,6 +162,8 @@ def _get_one_frame(cam_link,lable_link):
             lable_link.setPixmap(q_pixmap2)
         else:
             lable_link.clear()
+            lable_link =  QLabel("Hikrobot camera")
+
             print("no data[0x%x]" % ret)
 
 def _funck():
@@ -213,8 +213,9 @@ if __name__ == "__main__":
     button_disconect = QPushButton("Connect/disconect camera")
 
     layout.addWidget(label)
-    layout.addWidget(button_connect)
     layout.addWidget(button_disconect)
+    layout.addWidget(button_connect)
+
     window.show()
 
     cam = MvCamera()
