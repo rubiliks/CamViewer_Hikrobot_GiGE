@@ -10,6 +10,7 @@ import numpy as np
 import cv2
 import time
 
+import torch
 from ultralytics import YOLO
 
 
@@ -154,7 +155,6 @@ def _get_one_frame(cam_link,lable_link,model):
             results = model(img_color_rbb)
             annotated_frame = results[0].plot()
 
-
             q_image = QImage(annotated_frame.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
             q_pixmap = QPixmap.fromImage(q_image)
             q_pixmap2 = q_pixmap.copy()
@@ -201,9 +201,16 @@ def _serch_connect_grab(cam,deviceList,button_star_grab):
 
 
 if __name__ == "__main__":
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print(f"Using device: {device}")
+    print(f"PyTorch version: {torch.__version__}")
+    print(f"CUDA available: {torch.cuda.is_available()}")
+    print(f"CUDA version: {torch.version.cuda}")
+    print(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
 
     app = QApplication(sys.argv)
-    model = YOLO('yolov8n.pt')
+    #model = YOLO('yolov8n.pt')
+    model = YOLO('EMG_2025_24_06_v1.onnx')
 
     window = QMainWindow()
     window.setWindowTitle("Hikrobot")
