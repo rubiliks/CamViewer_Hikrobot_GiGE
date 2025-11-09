@@ -10,6 +10,9 @@ import numpy as np
 import cv2
 import time
 
+from ultralytics import YOLO
+
+
 x_global = False
 mem_connect = False
 
@@ -107,7 +110,7 @@ def _destroy_handle(cam_link):
         print ("destroy handle fail! ret[0x%x]" % ret)
         sys.exit()
 
-def _get_one_frame(cam_link,lable_link):
+def _get_one_frame(cam_link,lable_link,model):
     global x_global
     if x_global == True:
         start_time = time.time()
@@ -148,10 +151,13 @@ def _get_one_frame(cam_link,lable_link):
             heightImg, widthImg, channelsImg = img_color_rbb.shape
             bytes_per_lineImg = channelsImg * widthImg
 
-            q_image = QImage(img_color_rbb.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
+            results = model(img_color_rbb)
+            annotated_frame = results[0].plot()
+
+
+            q_image = QImage(annotated_frame.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
             q_pixmap = QPixmap.fromImage(q_image)
             q_pixmap2 = q_pixmap.copy()
-
 
             nRet = cam_link.MV_CC_FreeImageBuffer(stOutFrame)
 
@@ -163,7 +169,6 @@ def _get_one_frame(cam_link,lable_link):
         else:
             lable_link.clear()
             lable_link =  QLabel("Hikrobot camera")
-
             print("no data[0x%x]" % ret)
 
 def _funck():
@@ -174,7 +179,7 @@ def _funck():
     else:
         print("Stop Grab")
 
-def _serch_connect_grab(cam,deviceList):
+def _serch_connect_grab(cam,deviceList,button_star_grab):
     global mem_connect
     if mem_connect == False:
         _update_cam_list(cam,deviceList)
@@ -182,19 +187,23 @@ def _serch_connect_grab(cam,deviceList):
             print("intput error!")
             sys.exit()
         stDeviceList = cast(deviceList.pDeviceInfo[int(nConnectionNum)], POINTER(MV_CC_DEVICE_INFO)).contents
-
         _create_cam_handle(stDeviceList)
         _open_cam(cam,stDeviceList)
         _set_camera_setting(cam)
         _start_grab(cam)
         mem_connect = True
+        button_star_grab.setEnabled(True)
     else:
         _close_cam(cam)
         _destroy_handle(cam)
         mem_connect = False
+        button_star_grab.setEnabled(False)
+
 
 if __name__ == "__main__":
+
     app = QApplication(sys.argv)
+    model = YOLO('yolov8n.pt')
 
     window = QMainWindow()
     window.setWindowTitle("Hikrobot")
@@ -209,12 +218,13 @@ if __name__ == "__main__":
     label.resize(720, 540)
     label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    button_connect = QPushButton("Start grab")
-    button_disconect = QPushButton("Connect/disconect camera")
+    button_star_grab = QPushButton("Start/stop grabing")
+    button_connect_disconect = QPushButton("Connect/disconect camera")
+    button_star_grab.setEnabled(False)
 
     layout.addWidget(label)
-    layout.addWidget(button_disconect)
-    layout.addWidget(button_connect)
+    layout.addWidget(button_connect_disconect)
+    layout.addWidget(button_star_grab)
 
     window.show()
 
@@ -224,12 +234,12 @@ if __name__ == "__main__":
     nConnectionNum = 0
     deviceList = MV_CC_DEVICE_INFO_LIST()
 
-    button_connect.clicked.connect(_funck)
-    button_disconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList))
+    button_star_grab.clicked.connect(_funck)
+    button_connect_disconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList,button_star_grab))
 
     timer = QTimer()
     timer.setInterval(10)
-    timer.timeout.connect(lambda:_get_one_frame(cam,label))
+    timer.timeout.connect(lambda:_get_one_frame(cam,label,model))
     timer.start()
 
     sys.exit(app.exec())
