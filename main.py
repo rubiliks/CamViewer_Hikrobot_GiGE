@@ -148,13 +148,18 @@ def _get_one_frame(cam_link,lable_link,model):
                                      dtype=np.uint8)  # data以流的形式读入转化成ndarray对象
             img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)
 
-            img_color_rbb = cv2.cvtColor(img_buff, cv2.COLOR_BGR2RGB)
+            if True: # тестовое изображение
+                image = cv2.imread('Test_img.jpg')
+                image = cv2.resize(image, (720, 540))
+                img_buff = image
+
+            img_color_rbb = img_buff
             heightImg, widthImg, channelsImg = img_color_rbb.shape
             bytes_per_lineImg = channelsImg * widthImg
 
             results = model(img_color_rbb)
             annotated_frame = results[0].plot()
-
+            annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
             q_image = QImage(annotated_frame.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
             q_pixmap = QPixmap.fromImage(q_image)
             q_pixmap2 = q_pixmap.copy()
@@ -210,7 +215,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     #model = YOLO('yolov8n.pt')
-    model = YOLO('EMG_2025_24_06_v1.onnx')
+    model = YOLO('EMG_2025_24_06_v1.pt')
 
     window = QMainWindow()
     window.setWindowTitle("Hikrobot")
@@ -250,3 +255,5 @@ if __name__ == "__main__":
     timer.start()
 
     sys.exit(app.exec())
+
+
