@@ -8,6 +8,10 @@ from PySide6.QtGui import QPixmap, QImage
 from PySide6.QtCore import QTimer
 
 from MvCameraControl_class import *
+import pymodbus
+from pymodbus.client import ModbusTcpClient
+
+
 
 import torch
 from ultralytics import YOLO
@@ -211,8 +215,35 @@ if __name__ == "__main__":
     print(f"CUDA version: {torch.version.cuda}")
     print(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
 
+    from pymodbus.client import ModbusTcpClient
+
+    print(f"Версия pymodbus: {pymodbus.__version__}")
+
+    # Подключение к устройству
+    client = ModbusTcpClient(
+        host='192.168.4.176',  # IP-адрес устройства
+        port=502,  # Стандартный порт Modbus TCP
+        timeout=3,  # Таймаут в секундах
+        retries=3  # Количество попыток переподключения
+    )
+
+    result = client.read_discrete_inputs(
+        address=0,  # Начальный адрес
+        count=8,  # Количество битов (8 bits)
+        device_id=1  # ID устройства
+    )
+
+    if not result.isError():
+        bits = result.bits[:8]  # Берем первые 8 битов
+        print(f"Input bits: {bits}")
+
+        # Вывод в удобном формате
+        print("Состояние input bits:")
+        for i, bit in enumerate(bits):
+            print(f"Bit {i}: {'ON' if bit else 'OFF'}")
+
+
     app = QApplication(sys.argv)
-    #model = YOLO('yolov8n.pt')
     model = YOLO('EMG_2025_24_06_v1.engine')
 
     window = QMainWindow()
@@ -248,10 +279,9 @@ if __name__ == "__main__":
     button_connect_disconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList,button_star_grab))
 
     timer = QTimer()
-    timer.setInterval(10)
+    timer.setInterval(50)
     timer.timeout.connect(lambda:_get_one_frame(cam,label,model))
     timer.start()
 
     sys.exit(app.exec())
-
 
