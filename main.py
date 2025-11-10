@@ -1,4 +1,7 @@
-import sys
+import numpy as np
+import cv2
+import time
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QMainWindow, QPushButton
 from PySide6.QtGui import QPixmap, QImage
@@ -6,13 +9,8 @@ from PySide6.QtCore import QTimer
 
 from MvCameraControl_class import *
 
-import numpy as np
-import cv2
-import time
-
 import torch
 from ultralytics import YOLO
-
 
 x_global = False
 mem_connect = False
@@ -148,7 +146,7 @@ def _get_one_frame(cam_link,lable_link,model):
                                      dtype=np.uint8)  # data以流的形式读入转化成ndarray对象
             img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)
 
-            if True: # тестовое изображение
+            if False: # тестовое изображение
                 image = cv2.imread('Test_img.jpg')
                 image = cv2.resize(image, (720, 540))
                 img_buff = image
@@ -215,7 +213,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     #model = YOLO('yolov8n.pt')
-    model = YOLO('EMG_2025_24_06_v1.pt')
+    model = YOLO('EMG_2025_24_06_v1.engine')
 
     window = QMainWindow()
     window.setWindowTitle("Hikrobot")
