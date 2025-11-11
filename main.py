@@ -8,10 +8,9 @@ from PySide6.QtGui import QPixmap, QImage
 from PySide6.QtCore import QTimer
 
 from MvCameraControl_class import *
+
 import pymodbus
 from pymodbus.client import ModbusTcpClient
-
-
 
 import torch
 from ultralytics import YOLO
@@ -206,44 +205,48 @@ def _serch_connect_grab(cam,deviceList,button_star_grab):
         mem_connect = False
         button_star_grab.setEnabled(False)
 
-
-if __name__ == "__main__":
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f"Using device: {device}")
-    print(f"PyTorch version: {torch.__version__}")
-    print(f"CUDA available: {torch.cuda.is_available()}")
-    print(f"CUDA version: {torch.version.cuda}")
-    print(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
-
-    from pymodbus.client import ModbusTcpClient
-
-    print(f"Версия pymodbus: {pymodbus.__version__}")
-
-    # Подключение к устройству
-    client = ModbusTcpClient(
+def _modbus_connect():
+    client_link = ModbusTcpClient(
         host='192.168.4.176',  # IP-адрес устройства
         port=502,  # Стандартный порт Modbus TCP
         timeout=3,  # Таймаут в секундах
         retries=3  # Количество попыток переподключения
     )
+    return  client_link
 
-    result = client.read_discrete_inputs(
+def _modbus_read(client_link):
+    if client_link.connect():
+        print("Успешное подключение modbus")
+    result = client_link.read_discrete_inputs(
         address=0,  # Начальный адрес
         count=8,  # Количество битов (8 bits)
         device_id=1  # ID устройства
     )
 
     if not result.isError():
-        bits = result.bits[:8]  # Берем первые 8 битов
+        bits = result.bits[:8]
         print(f"Input bits: {bits}")
-
-        # Вывод в удобном формате
         print("Состояние input bits:")
         for i, bit in enumerate(bits):
             print(f"Bit {i}: {'ON' if bit else 'OFF'}")
 
 
+if __name__ == "__main__":
+    # Checking the environment
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print(f"Using device: {device}")
+    print(f"PyTorch version: {torch.__version__}")
+    print(f"CUDA available: {torch.cuda.is_available()}")
+    print(f"CUDA version: {torch.version.cuda}")
+    print(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
+    print(f"Версия pymodbus: {pymodbus.__version__}")
+
+    #Qt app create
     app = QApplication(sys.argv)
+
+    client = _modbus_connect()
+    _modbus_read(client)
+
     model = YOLO('EMG_2025_24_06_v1.engine')
 
     window = QMainWindow()
