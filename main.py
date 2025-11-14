@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 import time
 
+import logging
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QMainWindow, QPushButton
 from PySide6.QtGui import QPixmap, QImage
@@ -67,6 +69,7 @@ def _open_cam(cam_link,st_device_list):
             print ("Warning: Get Packet Size fail! ret[0x%x]" % nPacketSize)
 
 def _set_camera_setting(cam_link):
+    global ExposureTime
     print("Set camera setting")
     #Set trigger mode as off
     ret = cam_link.MV_CC_SetEnumValue("TriggerMode", MV_TRIGGER_MODE_OFF)
@@ -88,7 +91,7 @@ def _set_camera_setting(cam_link):
         print("set ExposureAuto mode fail! ret[0x%x]" % ret)
         sys.exit()
     # Set ExposureTime
-    ret = cam_link.MV_CC_SetFloatValue("ExposureTime", 10000)
+    ret = cam_link.MV_CC_SetFloatValue("ExposureTime", ExposureTime)
     if ret != 0:
         print("set ExposureTime fail! ret[0x%x]" % ret)
         sys.exit()
@@ -234,6 +237,12 @@ def _modbus_read(client_link):
         for i, bit in enumerate(bits):
             print(f"Bit {i}: {'ON' if bit else 'OFF'}")
 
+def _changeValue(value):
+    global ExposureTime
+    ExposureTime = value
+    print(ExposureTime)
+
+
 
 if __name__ == "__main__":
     # Checking the environment
@@ -245,6 +254,23 @@ if __name__ == "__main__":
     print(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
     print(f"Версия pymodbus: {pymodbus.__version__}")
 
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler('app.log'),
+            logging.StreamHandler()
+        ]
+    )
+
+    logger = logging.getLogger(__name__)
+
+    logger.debug('Отладочная информация')
+    logger.info('Информационное сообщение')
+    logger.warning('Предупреждение')
+    logger.error('Ошибка')
+    logger.critical('Критическая ошибка')
+
     #Qt app create
     app = QApplication(sys.argv)
 
@@ -252,12 +278,15 @@ if __name__ == "__main__":
     #_modbus_read(client)
 
     model = YOLO('EMG_2025_24_06_v1.engine')
+    ExposureTime = 200
+    Gain = 0.0
 
     window = QMainWindow()
     ui = Ui_MainWindow()  # Создаем экземпляр UI
     ui.setupUi(window)  # Настраиваем окно через UI
 
     window.setWindowTitle("Hikrobot Camera Viewer")
+    window.minimumSize()
     window.show()
 
     cam = MvCamera()
@@ -269,9 +298,16 @@ if __name__ == "__main__":
     ui.pushButtonConnectDisconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList,ui.pushButtonStartStopGrab))
     ui.pushButtonStartStopGrab.clicked.connect(_funck)
 
+
+    ui.exposureTime_spinBox.setRange(0,20000)
+    ui.exposureTime_spinBox.setValue(ExposureTime)
+    ui.exposureTime_spinBox.valueChanged.connect(_changeValue)
+
     timer = QTimer()
+    timer.setInterval(10)
     timer.timeout.connect(lambda:_get_one_frame(cam,ui.label,model))
     timer.start()
+
 
     sys.exit(app.exec())
 
