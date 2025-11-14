@@ -96,7 +96,7 @@ def _set_camera_setting(cam_link):
         print("set ExposureTime fail! ret[0x%x]" % ret)
         sys.exit()
     # Set Gain
-    ret = cam_link.MV_CC_SetFloatValue("Gain", 5.0)
+    ret = cam_link.MV_CC_SetFloatValue("Gain", Gain)
     if ret != 0:
         print("set Gain fail! ret[0x%x]" % ret)
         sys.exit()
@@ -237,10 +237,15 @@ def _modbus_read(client_link):
         for i, bit in enumerate(bits):
             print(f"Bit {i}: {'ON' if bit else 'OFF'}")
 
-def _changeValue(value):
+def _changeValueExposureTime(value):
     global ExposureTime
     ExposureTime = value
     print(ExposureTime)
+
+def _changeValueGain(value):
+    global Gain
+    Gain = value
+    print(Gain)
 
 
 
@@ -278,8 +283,8 @@ if __name__ == "__main__":
     #_modbus_read(client)
 
     model = YOLO('EMG_2025_24_06_v1.engine')
-    ExposureTime = 200
-    Gain = 0.0
+    ExposureTime = 2000
+    Gain = 1.0
 
     window = QMainWindow()
     ui = Ui_MainWindow()  # Создаем экземпляр UI
@@ -298,10 +303,14 @@ if __name__ == "__main__":
     ui.pushButtonConnectDisconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList,ui.pushButtonStartStopGrab))
     ui.pushButtonStartStopGrab.clicked.connect(_funck)
 
+    ui.gain_doubleSpinBox.setRange(0.0,20.0)
+    ui.gain_doubleSpinBox.setValue(Gain)
+    ui.gain_doubleSpinBox.valueChanged.connect(_changeValueGain)
+
 
     ui.exposureTime_spinBox.setRange(0,20000)
     ui.exposureTime_spinBox.setValue(ExposureTime)
-    ui.exposureTime_spinBox.valueChanged.connect(_changeValue)
+    ui.exposureTime_spinBox.valueChanged.connect(_changeValueExposureTime)
 
     timer = QTimer()
     timer.setInterval(10)
