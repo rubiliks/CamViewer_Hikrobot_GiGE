@@ -234,9 +234,6 @@ def _modbus_read(client_link):
         for i, bit in enumerate(bits):
             print(f"Bit {i}: {'ON' if bit else 'OFF'}")
 
-def _test():
-    print("test buttom")
-
 
 if __name__ == "__main__":
     # Checking the environment
@@ -251,8 +248,8 @@ if __name__ == "__main__":
     #Qt app create
     app = QApplication(sys.argv)
 
-    client = _modbus_connect()
-    _modbus_read(client)
+    #client = _modbus_connect()
+    #_modbus_read(client)
 
     model = YOLO('EMG_2025_24_06_v1.engine')
 
@@ -263,46 +260,18 @@ if __name__ == "__main__":
     window.setWindowTitle("Hikrobot Camera Viewer")
     window.show()
 
-
-
-    #window.setWindowTitle("Hikrobot")
-   # window.setGeometry(100, 100, 800, 600)
-
-    #central_widget = QWidget()
-    #window.setCentralWidget(central_widget)
-
-    #layout = QVBoxLayout(central_widget)
-    #label = QLabel("Hikrobot camera", window)
-    #label.setWindowTitle("Камера")
-    #label.resize(720, 540)
-    #label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-    #button_star_grab = QPushButton("Start/stop grabing")
-    #button_connect_disconect = QPushButton("Connect/disconect camera")
-    #button_star_grab.setEnabled(False)
-
-    #layout.addWidget(label)
-    #layout.addWidget(button_connect_disconect)
-    #layout.addWidget(button_star_grab)
-
-    #window.show()
-
-
     cam = MvCamera()
 
     MvCamera.MV_CC_Initialize()
     nConnectionNum = 0
     deviceList = MV_CC_DEVICE_INFO_LIST()
-    print(deviceList)
 
-    ui.pushButtonConnectDisconect.clicked.connect(_test)
+    ui.pushButtonConnectDisconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList,ui.pushButtonStartStopGrab))
+    ui.pushButtonStartStopGrab.clicked.connect(_funck)
 
-    #button_star_grab.clicked.connect(_funck)
-    #button_connect_disconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList,button_star_grab))
-
-    #timer = QTimer()
-    ##timer.timeout.connect(lambda:_get_one_frame(cam,label,model))
-    #timer.start()
+    timer = QTimer()
+    timer.timeout.connect(lambda:_get_one_frame(cam,ui.label,model))
+    timer.start()
 
     sys.exit(app.exec())
 
