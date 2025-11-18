@@ -31,6 +31,7 @@ class HikCam():
         self.nConnectionNum = 0
         self.deviceList = MV_CC_DEVICE_INFO_LIST()
         self.mem_connect = False
+        self.stDeviceList = 0
 
     def _update_cam_list(self):
         ret = self.cam.MV_CC_EnumDevices(MV_GIGE_DEVICE, self.deviceList)
@@ -54,9 +55,26 @@ class HikCam():
                 nip4 = (mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x000000ff)
                 print("current ip: %d.%d.%d.%d\n" % (nip1, nip2, nip3, nip4))
 
-
-
-
+    def _create_cam_handle_open_setting(self):
+        # _update_cam_list
+        if int(self.nConnectionNum) >= self.deviceList.nDeviceNum:
+            print("intput error!")
+            sys.exit()
+        self.stDeviceList = cast(self.deviceList.pDeviceInfo[int(self.nConnectionNum)], POINTER(MV_CC_DEVICE_INFO)).contents
+        # _сreate Handle
+        ret = self.cam.MV_CC_CreateHandle(self.stDeviceList)
+        if ret != 0:
+            print("create handle fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            print("created handle ")
+        # _open camera
+        ret = self.cam.MV_CC_OpenDevice(MV_ACCESS_Exclusive, 0)
+        if ret != 0:
+            print("open device fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            print("device open ")
 
 
 def _update_cam_list(cam_link,cam_list_link):
@@ -240,10 +258,12 @@ def _serch_connect_grab(cam,deviceList,button_star_grab):
     global mem_connect
     if mem_connect == False:
         _update_cam_list(cam,deviceList)
+
         if int(nConnectionNum) >= deviceList.nDeviceNum:
             print("intput error!")
             sys.exit()
         stDeviceList = cast(deviceList.pDeviceInfo[int(nConnectionNum)], POINTER(MV_CC_DEVICE_INFO)).contents
+
         _create_cam_handle(stDeviceList)
         _open_cam(cam,stDeviceList)
         _set_camera_setting(cam)
@@ -303,9 +323,7 @@ if __name__ == "__main__":
     print(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
     print(f"Версия pymodbus: {pymodbus.__version__}")
 
-    hikCamera1 = HikCam(10)
-    hikCamera1._update_cam_list()
-    print(hikCamera1.testPrint())
+
 
 
 
@@ -328,6 +346,11 @@ if __name__ == "__main__":
 
     #Qt app create
     app = QApplication(sys.argv)
+
+
+    hikCamera1 = HikCam(10)
+    hikCamera1._update_cam_list()
+    hikCamera1._create_cam_handle_open_setting()
 
     #client = _modbus_connect()
     #_modbus_read(client)
