@@ -41,7 +41,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.label)
 
-
         self.gridLayout_2.addWidget(self.videoWidget, 0, 0, 1, 1)
 
         self.groupBoxButton = QGroupBox(self.centralwidget)
@@ -102,8 +101,8 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         QMetaObject.connectSlotsByName(MainWindow)
-    # setupUi
 
+    # setupUi
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Camera view", None))

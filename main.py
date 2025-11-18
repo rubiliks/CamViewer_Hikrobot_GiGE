@@ -23,6 +23,41 @@ from mainWindowSmir import Ui_MainWindow
 x_global = False
 mem_connect = False
 
+class HikCam():
+    def __init__(self,number):
+        self.number = number
+        self.cam = MvCamera()
+        MvCamera.MV_CC_Initialize()
+        self.nConnectionNum = 0
+        self.deviceList = MV_CC_DEVICE_INFO_LIST()
+        self.mem_connect = False
+
+    def _update_cam_list(self):
+        ret = self.cam.MV_CC_EnumDevices(MV_GIGE_DEVICE, self.deviceList)
+        if ret != 0:
+            print("enum devices fail! ret[0x%x]" % ret)
+            sys.exit()
+        if self.deviceList.nDeviceNum == 0:
+            print("find no device!")
+            sys.exit()
+        print("Find %d devices!" % self.deviceList.nDeviceNum)
+        # print info for all  gige cam
+        for i in range(0, self.deviceList.nDeviceNum):
+            mvcc_dev_info = cast(self.deviceList.pDeviceInfo[i], POINTER(MV_CC_DEVICE_INFO)).contents
+            if mvcc_dev_info.nTLayerType == MV_GIGE_DEVICE or mvcc_dev_info.nTLayerType == MV_GENTL_GIGE_DEVICE:
+                print("\ngige device: [%d]" % i)
+                strModeName = ''.join([chr(c) for c in mvcc_dev_info.SpecialInfo.stGigEInfo.chModelName if c != 0])
+                print("device model name: %s" % strModeName)
+                nip1 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0xff000000) >> 24)
+                nip2 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x00ff0000) >> 16)
+                nip3 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x0000ff00) >> 8)
+                nip4 = (mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x000000ff)
+                print("current ip: %d.%d.%d.%d\n" % (nip1, nip2, nip3, nip4))
+
+
+
+
+
 
 def _update_cam_list(cam_link,cam_list_link):
     ret = cam_link.MV_CC_EnumDevices(MV_GIGE_DEVICE, cam_list_link)
@@ -128,9 +163,9 @@ def _get_one_frame(cam_link,lable_link,model):
         ret = cam_link.MV_CC_GetImageBuffer(stOutFrame, 10000)  # читаем из буфера камеры
         img_buff = None
         if None != stOutFrame.pBufAddr and 0 == ret:
-            print("MV_CC_GetImageBuffer: Width[%d], Height[%d], nFrameNum[%d]" % (stOutFrame.stFrameInfo.nWidth,
-                                                                                  stOutFrame.stFrameInfo.nHeight,
-                                                                                  stOutFrame.stFrameInfo.nFrameNum))
+            #print("MV_CC_GetImageBuffer: Width[%d], Height[%d], nFrameNum[%d]" % (stOutFrame.stFrameInfo.nWidth,
+            #                                                                      stOutFrame.stFrameInfo.nHeight,
+            #                                                                      stOutFrame.stFrameInfo.nFrameNum))
             stConvertParam = MV_CC_PIXEL_CONVERT_PARAM()
             memset(byref(stConvertParam), 0, sizeof(stConvertParam))
             stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed  # opecv要用BGR，不能使用RGB
@@ -147,7 +182,7 @@ def _get_one_frame(cam_link,lable_link,model):
             stConvertParam.nDstBufferSize = nConvertSize
             ret = cam_link.MV_CC_ConvertPixelType(stConvertParam)  # конвертируем пиксели в правильном порядке
             if ret != 0:
-                print("convert pixel fail! ret[0x%x]" % ret)
+                #print("convert pixel fail! ret[0x%x]" % ret)
                 del stConvertParam.pSrcData
                 sys.exit()
             img_buff = (c_ubyte * stConvertParam.nDstLen)()
@@ -168,16 +203,25 @@ def _get_one_frame(cam_link,lable_link,model):
             results = model(img_color_rbb)
             annotated_frame = results[0].plot()
             annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
+
+            end_time = time.time()
+            execution_time = end_time - start_time
+            fps = 1 / execution_time
+            #print(f"Время выполнения: {execution_time:.6f} секунд, FPS: {fps:.6f}")
+
+            cv2.putText(annotated_frame, f"FPS: {fps:.2f}", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+
+
+
             q_image = QImage(annotated_frame.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
             q_pixmap = QPixmap.fromImage(q_image)
             q_pixmap2 = q_pixmap.copy()
 
             nRet = cam_link.MV_CC_FreeImageBuffer(stOutFrame)
 
-            end_time = time.time()
-            execution_time = end_time - start_time
-            fps = 1 / execution_time
-            print(f"Время выполнения: {execution_time:.6f} секунд, FPS: {fps:.6f}")
+
             lable_link.setPixmap(q_pixmap2)
         else:
             lable_link.clear()
@@ -259,6 +303,12 @@ if __name__ == "__main__":
     print(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
     print(f"Версия pymodbus: {pymodbus.__version__}")
 
+    hikCamera1 = HikCam(10)
+    hikCamera1._update_cam_list()
+    print(hikCamera1.testPrint())
+
+
+
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -294,13 +344,13 @@ if __name__ == "__main__":
     window.minimumSize()
     window.show()
 
-    cam = MvCamera()
+    #cam = MvCamera()
 
-    MvCamera.MV_CC_Initialize()
-    nConnectionNum = 0
-    deviceList = MV_CC_DEVICE_INFO_LIST()
+    #MvCamera.MV_CC_Initialize()
+    #nConnectionNum = 0
+    #deviceList = MV_CC_DEVICE_INFO_LIST()
 
-    ui.pushButtonConnectDisconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList,ui.pushButtonStartStopGrab))
+    #ui.pushButtonConnectDisconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList,ui.pushButtonStartStopGrab))
     ui.pushButtonStartStopGrab.clicked.connect(_funck)
 
     ui.gain_doubleSpinBox.setRange(0.0,20.0)
@@ -312,10 +362,10 @@ if __name__ == "__main__":
     ui.exposureTime_spinBox.setValue(ExposureTime)
     ui.exposureTime_spinBox.valueChanged.connect(_changeValueExposureTime)
 
-    timer = QTimer()
-    timer.setInterval(10)
-    timer.timeout.connect(lambda:_get_one_frame(cam,ui.label,model))
-    timer.start()
+    #imer = QTimer()
+    #timer.setInterval(10)
+    #timer.timeout.connect(lambda:_get_one_frame(cam,ui.label,model))
+    #timer.start()
 
 
     sys.exit(app.exec())
