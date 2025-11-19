@@ -173,7 +173,7 @@ class HikCam():
                 sys.exit()
             return img_buff
         else:
-            imageError = cv2.imread('Test_img.jpg')
+            imageError = cv2.imread('no_cam_connect.jpg')
             print("no data[0x%x]" % ret)
             return imageError
 
