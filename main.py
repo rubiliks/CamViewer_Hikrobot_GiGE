@@ -20,9 +20,6 @@ from ultralytics import YOLO
 from mainWindowSmir import Ui_MainWindow
 
 
-x_global = False
-mem_connect = False
-
 class HikCam():
     def __init__(self,number):
         self.number = number
@@ -35,7 +32,7 @@ class HikCam():
         self.ExposureTime = 1000
         self.Gain = 2.0
 
-    def _update_cam_list(self):
+    def update_cam_list(self):
         ret = self.cam.MV_CC_EnumDevices(MV_GIGE_DEVICE, self.deviceList)
         if ret != 0:
             print("enum devices fail! ret[0x%x]" % ret)
@@ -57,7 +54,7 @@ class HikCam():
                 nip4 = (mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x000000ff)
                 print("current ip: %d.%d.%d.%d\n" % (nip1, nip2, nip3, nip4))
 
-    def _create_cam_handle_open_setting_start_grab(self):
+    def create_cam_handle_open_setting_start_grab(self):
 
         # _update_cam_list
         if int(self.nConnectionNum) >= self.deviceList.nDeviceNum:
@@ -138,7 +135,7 @@ class HikCam():
         else:
             print("start grabbing ")
 
-    def _get_one_frame(self):
+    def get_one_frame(self):
         stOutFrame = MV_FRAME_OUT()  # переменная выходного фрейм  тип данных
         memset(byref(stOutFrame), 0, sizeof(stOutFrame))  # заполняем всю структуру нулями
         ret = self.cam.MV_CC_GetImageBuffer(stOutFrame, 10000)  # читаем из буфера камеры
@@ -180,16 +177,15 @@ class HikCam():
             print("no data[0x%x]" % ret)
             return imageError
 
-
-class cnnYolo():
+class CnnYolo():
     def __init__(self):
         self.model = 0
         self.modelEnginePath ='EMG_2025_24_06_v1.engine'
 
-    def _createModel(self):
+    def create_model(self):
         self.model = YOLO(self.modelEnginePath)
 
-    def objectDetection(self,image):
+    def object_detection(self,image):
         start_time = time.time()
         img_color_rbb = image
         heightImg, widthImg, channelsImg = img_color_rbb.shape
@@ -211,6 +207,46 @@ class cnnYolo():
         q_pixmap = QPixmap.fromImage(q_image)
         q_pixmap2 = q_pixmap.copy()
         return q_pixmap2
+
+    def check_envir(self):
+        # Checking the environment
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        print(f"Using device: {device}")
+        print(f"PyTorch version: {torch.__version__}")
+        print(f"CUDA available: {torch.cuda.is_available()}")
+        print(f"CUDA version: {torch.version.cuda}")
+        print(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
+        print(f"Версия pymodbus: {pymodbus.__version__}")
+
+class Logger:
+    def __init__(self, name: str = __name__):
+        self._setup_logging()
+        self.logger = logging.getLogger(name)
+
+    def _setup_logging(self):
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler('app.log'),
+                logging.StreamHandler()
+            ]
+        )
+
+    def debug(self, message: str):
+        self.logger.debug(message)
+
+    def info(self, message: str):
+        self.logger.info(message)
+
+    def warning(self, message: str):
+        self.logger.warning(message)
+
+    def error(self, message: str):
+        self.logger.error(message)
+
+    def critical(self, message: str):
+        self.logger.critical(message)
 
 
 def _update_cam_list(cam_link,cam_list_link):
@@ -448,48 +484,26 @@ def _changeValueGain(value):
     print(Gain)
 
 
+def updateFrame(HikCam_link,CnnYolo_link,lable_link):
+    lable_frame = HikCam_link.get_one_frame()
+    lable_detection = CnnYolo_link.object_detection(lable_frame)
+    lable_link.setPixmap(lable_detection)
+
+
 
 if __name__ == "__main__":
-    # Checking the environment
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f"Using device: {device}")
-    print(f"PyTorch version: {torch.__version__}")
-    print(f"CUDA available: {torch.cuda.is_available()}")
-    print(f"CUDA version: {torch.version.cuda}")
-    print(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
-    print(f"Версия pymodbus: {pymodbus.__version__}")
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler('app.log'),
-            logging.StreamHandler()
-        ]
-    )
-
-    logger = logging.getLogger(__name__)
-
-    logger.debug('Отладочная информация')
-    logger.info('Информационное сообщение')
-    logger.warning('Предупреждение')
-    logger.error('Ошибка')
-    logger.critical('Критическая ошибка')
 
     #Qt app create
     app = QApplication(sys.argv)
 
     hikCamera1 = HikCam(10)
-    hikCamera1._update_cam_list()
-    hikCamera1._create_cam_handle_open_setting_start_grab()
+    hikCamera1.update_cam_list()
+    hikCamera1.create_cam_handle_open_setting_start_grab()
 
-    cnn1 = cnnYolo()
-    cnn1._createModel()
+    cnn1 = CnnYolo()
+    cnn1.check_envir()
+    cnn1.create_model()
 
-    #client = _modbus_connect()
-    #_modbus_read(client)
-
-    # model = YOLO('EMG_2025_24_06_v1.engine')
     ExposureTime = 2000
     Gain = 1.0
 
@@ -501,12 +515,6 @@ if __name__ == "__main__":
     window.minimumSize()
     window.show()
 
-    #cam = MvCamera()
-
-    #MvCamera.MV_CC_Initialize()
-    #nConnectionNum = 0
-    #deviceList = MV_CC_DEVICE_INFO_LIST()
-
     #ui.pushButtonConnectDisconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList,ui.pushButtonStartStopGrab))
     ui.pushButtonStartStopGrab.clicked.connect(_funck)
 
@@ -514,22 +522,19 @@ if __name__ == "__main__":
     ui.gain_doubleSpinBox.setValue(Gain)
     ui.gain_doubleSpinBox.valueChanged.connect(_changeValueGain)
 
-
     ui.exposureTime_spinBox.setRange(0,20000)
     ui.exposureTime_spinBox.setValue(ExposureTime)
     ui.exposureTime_spinBox.valueChanged.connect(_changeValueExposureTime)
 
-    testLable = hikCamera1._get_one_frame()
-    testPixMape = cnn1.objectDetection(testLable)
+    testLable = hikCamera1.get_one_frame()
+    testPixMape = cnn1.object_detection(testLable)
 
     ui.label.setPixmap(testPixMape)
 
-
-
-    #imer = QTimer()
-    #timer.setInterval(10)
-    #timer.timeout.connect(lambda:_get_one_frame(cam,ui.label,model))
-    #timer.start()
+    timer = QTimer()
+    timer.setInterval(10)
+    timer.timeout.connect(lambda:updateFrame(hikCamera1,cnn1,ui.label))
+    timer.start()
 
 
     sys.exit(app.exec())
