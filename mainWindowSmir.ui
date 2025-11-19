@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>962</width>
+    <height>576</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <widget class="QWidget" name="videoWidget" native="true">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>720</width>
+           <height>540</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Camera view</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QGroupBox" name="groupBoxButton">
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>210</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Camera control</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="pushButtonConnectCam">
+         <property name="text">
+          <string>Connect Cam</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonDisconectCam">
+         <property name="text">
+          <string>Disconect Cam</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="CnnLayout">
+         <item>
+          <widget class="QLabel" name="cnn_control_label">
+           <property name="text">
+            <string>CNN control</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonStartObjDetectCnn">
+           <property name="text">
+            <string>Start Obj Detection</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonStopObjDetectCnn">
+           <property name="text">
+            <string>Stop Obj Detection</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="camera_setting_label">
+         <property name="text">
+          <string>Camera setting</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="1" column="0">
+          <widget class="QLabel" name="gain_lable">
+           <property name="text">
+            <string>Gain</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="exposureTime_spinBox"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="exposureTime_lable">
+           <property name="text">
+            <string>ExposureTime</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="gain_doubleSpinBox"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

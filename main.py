@@ -177,6 +177,21 @@ class HikCam():
             print("no data[0x%x]" % ret)
             return imageError
 
+    def close_grab_destroy_handle(self):
+        ret = self.cam.MV_CC_CloseDevice()
+        if ret != 0:
+            print("close deivce fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            print("deivce close")
+
+        ret = self.cam.MV_CC_DestroyHandle()
+        if ret != 0:
+            print("destroy handle fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            print("handle destroy")
+
 class CnnYolo():
     def __init__(self):
         self.model = 0
@@ -198,8 +213,6 @@ class CnnYolo():
         end_time = time.time()
         execution_time = end_time - start_time
         fps = 1 / execution_time
-        print(f"Время выполнения: {execution_time:.6f} секунд, FPS: {fps:.6f}")
-
         cv2.putText(annotated_frame, f"FPS: {fps:.2f}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
@@ -484,11 +497,10 @@ def _changeValueGain(value):
     print(Gain)
 
 
-def updateFrame(HikCam_link,CnnYolo_link,lable_link):
-    lable_frame = HikCam_link.get_one_frame()
-    lable_detection = CnnYolo_link.object_detection(lable_frame)
+def update_frame(hikcam_link,cnnyolo_link,lable_link):
+    lable_frame = hikcam_link.get_one_frame()
+    lable_detection = cnnyolo_link.object_detection(lable_frame)
     lable_link.setPixmap(lable_detection)
-
 
 
 if __name__ == "__main__":
@@ -498,7 +510,7 @@ if __name__ == "__main__":
 
     hikCamera1 = HikCam(10)
     hikCamera1.update_cam_list()
-    hikCamera1.create_cam_handle_open_setting_start_grab()
+    #hikCamera1.create_cam_handle_open_setting_start_grab()
 
     cnn1 = CnnYolo()
     cnn1.check_envir()
@@ -515,8 +527,8 @@ if __name__ == "__main__":
     window.minimumSize()
     window.show()
 
-    #ui.pushButtonConnectDisconect.clicked.connect(lambda:_serch_connect_grab(cam, deviceList,ui.pushButtonStartStopGrab))
-    ui.pushButtonStartStopGrab.clicked.connect(_funck)
+    ui.pushButtonConnectDisconect.clicked.connect(lambda:hikCamera1.close_grab_destroy_handle())
+    ui.pushButtonStartStopGrab.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
 
     ui.gain_doubleSpinBox.setRange(0.0,20.0)
     ui.gain_doubleSpinBox.setValue(Gain)
@@ -526,16 +538,10 @@ if __name__ == "__main__":
     ui.exposureTime_spinBox.setValue(ExposureTime)
     ui.exposureTime_spinBox.valueChanged.connect(_changeValueExposureTime)
 
-    testLable = hikCamera1.get_one_frame()
-    testPixMape = cnn1.object_detection(testLable)
-
-    ui.label.setPixmap(testPixMape)
-
     timer = QTimer()
     timer.setInterval(10)
-    timer.timeout.connect(lambda:updateFrame(hikCamera1,cnn1,ui.label))
+    #timer.timeout.connect(lambda:update_frame(hikCamera1,cnn1,ui.label))
     timer.start()
-
 
     sys.exit(app.exec())
 

@@ -41,6 +41,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.label)
 
+
         self.gridLayout_2.addWidget(self.videoWidget, 0, 0, 1, 1)
 
         self.groupBoxButton = QGroupBox(self.centralwidget)
@@ -49,15 +50,35 @@ class Ui_MainWindow(object):
         self.groupBoxButton.setMaximumSize(QSize(210, 16777215))
         self.verticalLayout_2 = QVBoxLayout(self.groupBoxButton)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.pushButtonConnectDisconect = QPushButton(self.groupBoxButton)
-        self.pushButtonConnectDisconect.setObjectName(u"pushButtonConnectDisconect")
+        self.pushButtonConnectCam = QPushButton(self.groupBoxButton)
+        self.pushButtonConnectCam.setObjectName(u"pushButtonConnectCam")
 
-        self.verticalLayout_2.addWidget(self.pushButtonConnectDisconect)
+        self.verticalLayout_2.addWidget(self.pushButtonConnectCam)
 
-        self.pushButtonStartStopGrab = QPushButton(self.groupBoxButton)
-        self.pushButtonStartStopGrab.setObjectName(u"pushButtonStartStopGrab")
+        self.pushButtonDisconectCam = QPushButton(self.groupBoxButton)
+        self.pushButtonDisconectCam.setObjectName(u"pushButtonDisconectCam")
 
-        self.verticalLayout_2.addWidget(self.pushButtonStartStopGrab)
+        self.verticalLayout_2.addWidget(self.pushButtonDisconectCam)
+
+        self.CnnLayout = QVBoxLayout()
+        self.CnnLayout.setObjectName(u"CnnLayout")
+        self.cnn_control_label = QLabel(self.groupBoxButton)
+        self.cnn_control_label.setObjectName(u"cnn_control_label")
+
+        self.CnnLayout.addWidget(self.cnn_control_label)
+
+        self.pushButtonStartObjDetectCnn = QPushButton(self.groupBoxButton)
+        self.pushButtonStartObjDetectCnn.setObjectName(u"pushButtonStartObjDetectCnn")
+
+        self.CnnLayout.addWidget(self.pushButtonStartObjDetectCnn)
+
+        self.pushButtonStopObjDetectCnn = QPushButton(self.groupBoxButton)
+        self.pushButtonStopObjDetectCnn.setObjectName(u"pushButtonStopObjDetectCnn")
+
+        self.CnnLayout.addWidget(self.pushButtonStopObjDetectCnn)
+
+
+        self.verticalLayout_2.addLayout(self.CnnLayout)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -101,14 +122,17 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         QMetaObject.connectSlotsByName(MainWindow)
-
     # setupUi
+
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Camera view", None))
         self.groupBoxButton.setTitle(QCoreApplication.translate("MainWindow", u"Camera control", None))
-        self.pushButtonConnectDisconect.setText(QCoreApplication.translate("MainWindow", u"ConnectDisconectCam", None))
-        self.pushButtonStartStopGrab.setText(QCoreApplication.translate("MainWindow", u"StartStopGrab", None))
+        self.pushButtonConnectCam.setText(QCoreApplication.translate("MainWindow", u"Connect Cam", None))
+        self.pushButtonDisconectCam.setText(QCoreApplication.translate("MainWindow", u"Disconect Cam", None))
+        self.cnn_control_label.setText(QCoreApplication.translate("MainWindow", u"CNN control", None))
+        self.pushButtonStartObjDetectCnn.setText(QCoreApplication.translate("MainWindow", u"Start Obj Detection", None))
+        self.pushButtonStopObjDetectCnn.setText(QCoreApplication.translate("MainWindow", u"Stop Obj Detection", None))
         self.camera_setting_label.setText(QCoreApplication.translate("MainWindow", u"Camera setting", None))
         self.gain_lable.setText(QCoreApplication.translate("MainWindow", u"Gain", None))
         self.exposureTime_lable.setText(QCoreApplication.translate("MainWindow", u"ExposureTime", None))
