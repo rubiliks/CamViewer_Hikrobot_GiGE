@@ -29,7 +29,7 @@ class HikCam():
         self.deviceList = MV_CC_DEVICE_INFO_LIST()
         self.mem_connect = False
         self.stDeviceList = 0
-        self.ExposureTime = 1000
+        self.ExposureTime = 10000
         self.Gain = 2.0
 
     def update_cam_list(self):
@@ -261,206 +261,6 @@ class Logger:
     def critical(self, message: str):
         self.logger.critical(message)
 
-
-def _update_cam_list(cam_link,cam_list_link):
-    ret = cam_link.MV_CC_EnumDevices(MV_GIGE_DEVICE, cam_list_link)
-    if ret != 0:
-        print("enum devices fail! ret[0x%x]" % ret)
-        sys.exit()
-    if cam_list_link.nDeviceNum == 0:
-        print("find no device!")
-        sys.exit()
-    print("Find %d devices!" % cam_list_link.nDeviceNum)
-    # print info for all  gige cam
-    for i in range(0, cam_list_link.nDeviceNum):
-        mvcc_dev_info = cast(cam_list_link.pDeviceInfo[i], POINTER(MV_CC_DEVICE_INFO)).contents
-        if mvcc_dev_info.nTLayerType == MV_GIGE_DEVICE or mvcc_dev_info.nTLayerType == MV_GENTL_GIGE_DEVICE:
-            print("\ngige device: [%d]" % i)
-            strModeName = ''.join([chr(c) for c in mvcc_dev_info.SpecialInfo.stGigEInfo.chModelName if c != 0])
-            print("device model name: %s" % strModeName)
-            nip1 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0xff000000) >> 24)
-            nip2 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x00ff0000) >> 16)
-            nip3 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x0000ff00) >> 8)
-            nip4 = (mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x000000ff)
-            print("current ip: %d.%d.%d.%d\n" % (nip1, nip2, nip3, nip4))
-
-def _create_cam_handle(st_device_list):
-    ret = cam.MV_CC_CreateHandle(st_device_list)
-    if ret != 0:
-        print ("create handle fail! ret[0x%x]" % ret)
-        sys.exit()
-
-def _open_cam(cam_link,st_device_list):
-    ret = cam_link.MV_CC_OpenDevice(MV_ACCESS_Exclusive, 0)
-    if ret != 0:
-        print("open device fail! ret[0x%x]" % ret)
-        sys.exit()
-
-    # Detection network optimal package size(It only works for the GigE camera)
-    if st_device_list.nTLayerType == MV_GIGE_DEVICE or st_device_list.nTLayerType == MV_GENTL_GIGE_DEVICE:
-        nPacketSize = cam_link.MV_CC_GetOptimalPacketSize()
-        if int(nPacketSize) > 0:
-            ret = cam_link.MV_CC_SetIntValue("GevSCPSPacketSize",nPacketSize)
-            if ret != 0:
-                print ("Warning: Set Packet Size fail! ret[0x%x]" % ret)
-        else:
-            print ("Warning: Get Packet Size fail! ret[0x%x]" % nPacketSize)
-
-def _set_camera_setting(cam_link):
-    global ExposureTime
-    print("Set camera setting")
-    #Set trigger mode as off
-    ret = cam_link.MV_CC_SetEnumValue("TriggerMode", MV_TRIGGER_MODE_OFF)
-    if ret != 0:
-        print ("set trigger mode fail! ret[0x%x]" % ret)
-        sys.exit()
-    ret = cam_link.MV_CC_SetEnumValue("GainAuto", MV_GAIN_MODE_OFF)
-    if ret != 0:
-        print("set GainAuto mode fail! ret[0x%x]" % ret)
-        sys.exit()
-    # Set BalanceWhiteAuto as off
-    ret = cam_link.MV_CC_SetEnumValue("BalanceWhiteAuto", MV_BALANCEWHITE_AUTO_OFF)
-    if ret != 0:
-        print("set GainAuto mode fail! ret[0x%x]" % ret)
-        sys.exit()
-    # Set ExposureAuto  as off
-    ret = cam_link.MV_CC_SetEnumValue("ExposureAuto", MV_EXPOSURE_AUTO_MODE_OFF)
-    if ret != 0:
-        print("set ExposureAuto mode fail! ret[0x%x]" % ret)
-        sys.exit()
-    # Set ExposureTime
-    ret = cam_link.MV_CC_SetFloatValue("ExposureTime", ExposureTime)
-    if ret != 0:
-        print("set ExposureTime fail! ret[0x%x]" % ret)
-        sys.exit()
-    # Set Gain
-    ret = cam_link.MV_CC_SetFloatValue("Gain", Gain)
-    if ret != 0:
-        print("set Gain fail! ret[0x%x]" % ret)
-        sys.exit()
-
-def _start_grab(cam_link):
-    ret = cam_link.MV_CC_StartGrabbing()
-    if ret != 0:
-        print ("start grabbing fail! ret[0x%x]" % ret)
-        sys.exit()
-
-def _close_cam(cam_link):
-    ret = cam_link.MV_CC_CloseDevice()
-    if ret != 0:
-        print ("close deivce fail! ret[0x%x]" % ret)
-        sys.exit()
-
-def _destroy_handle(cam_link):
-    ret = cam_link.MV_CC_DestroyHandle()
-    if ret != 0:
-        print ("destroy handle fail! ret[0x%x]" % ret)
-        sys.exit()
-
-def _get_one_frame(cam_link,lable_link,model):
-    global x_global
-    if x_global == True:
-        start_time = time.time()
-        stOutFrame = MV_FRAME_OUT()  # переменная выходного фрейм  тип данных
-        memset(byref(stOutFrame), 0, sizeof(stOutFrame))  # заполняем всю структуру нулями
-        ret = cam_link.MV_CC_GetImageBuffer(stOutFrame, 10000)  # читаем из буфера камеры
-        img_buff = None
-        if None != stOutFrame.pBufAddr and 0 == ret:
-            #print("MV_CC_GetImageBuffer: Width[%d], Height[%d], nFrameNum[%d]" % (stOutFrame.stFrameInfo.nWidth,
-            #                                                                      stOutFrame.stFrameInfo.nHeight,
-            #                                                                      stOutFrame.stFrameInfo.nFrameNum))
-            stConvertParam = MV_CC_PIXEL_CONVERT_PARAM()
-            memset(byref(stConvertParam), 0, sizeof(stConvertParam))
-            stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed  # opecv要用BGR，不能使用RGB
-            nConvertSize = stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3  # размер цветного кадра
-            # convert pixel
-            if img_buff is None:
-                img_buff = (c_ubyte * stOutFrame.stFrameInfo.nFrameLen)()
-            stConvertParam.nWidth = stOutFrame.stFrameInfo.nWidth
-            stConvertParam.nHeight = stOutFrame.stFrameInfo.nHeight
-            stConvertParam.pSrcData = cast(stOutFrame.pBufAddr, POINTER(c_ubyte))
-            stConvertParam.nSrcDataLen = stOutFrame.stFrameInfo.nFrameLen
-            stConvertParam.enSrcPixelType = stOutFrame.stFrameInfo.enPixelType
-            stConvertParam.pDstBuffer = (c_ubyte * nConvertSize)()
-            stConvertParam.nDstBufferSize = nConvertSize
-            ret = cam_link.MV_CC_ConvertPixelType(stConvertParam)  # конвертируем пиксели в правильном порядке
-            if ret != 0:
-                #print("convert pixel fail! ret[0x%x]" % ret)
-                del stConvertParam.pSrcData
-                sys.exit()
-            img_buff = (c_ubyte * stConvertParam.nDstLen)()
-            cdll.msvcrt.memcpy(byref(img_buff), stConvertParam.pDstBuffer, stConvertParam.nDstLen)  # копирование данных
-            img_buff = np.frombuffer(img_buff, count=int(stConvertParam.nDstBufferSize),  # преобразование в np массив
-                                     dtype=np.uint8)  # data以流的形式读入转化成ndarray对象
-            img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)
-
-            if False: # тестовое изображение
-                image = cv2.imread('Test_img.jpg')
-                image = cv2.resize(image, (720, 540))
-                img_buff = image
-
-            img_color_rbb = img_buff
-            heightImg, widthImg, channelsImg = img_color_rbb.shape
-            bytes_per_lineImg = channelsImg * widthImg
-
-            results = model(img_color_rbb)
-            annotated_frame = results[0].plot()
-            annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
-
-            end_time = time.time()
-            execution_time = end_time - start_time
-            fps = 1 / execution_time
-            #print(f"Время выполнения: {execution_time:.6f} секунд, FPS: {fps:.6f}")
-
-            cv2.putText(annotated_frame, f"FPS: {fps:.2f}", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-
-
-
-            q_image = QImage(annotated_frame.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
-            q_pixmap = QPixmap.fromImage(q_image)
-            q_pixmap2 = q_pixmap.copy()
-
-            nRet = cam_link.MV_CC_FreeImageBuffer(stOutFrame)
-
-
-            lable_link.setPixmap(q_pixmap2)
-        else:
-            lable_link.clear()
-            lable_link =  QLabel("Hikrobot camera")
-            print("no data[0x%x]" % ret)
-
-def _funck():
-    global x_global
-    x_global = not x_global
-    if x_global == True:
-        print("Start grab image")
-    else:
-        print("Stop Grab")
-
-def _serch_connect_grab(cam,deviceList,button_star_grab):
-    global mem_connect
-    if mem_connect == False:
-        _update_cam_list(cam,deviceList)
-
-        if int(nConnectionNum) >= deviceList.nDeviceNum:
-            print("intput error!")
-            sys.exit()
-        stDeviceList = cast(deviceList.pDeviceInfo[int(nConnectionNum)], POINTER(MV_CC_DEVICE_INFO)).contents
-
-        _create_cam_handle(stDeviceList)
-        _open_cam(cam,stDeviceList)
-        _set_camera_setting(cam)
-        _start_grab(cam)
-        mem_connect = True
-        button_star_grab.setEnabled(True)
-    else:
-        _close_cam(cam)
-        _destroy_handle(cam)
-        mem_connect = False
-        button_star_grab.setEnabled(False)
-
 def _modbus_connect():
     client_link = ModbusTcpClient(
         host='192.168.4.176',  # IP-адрес устройства
@@ -486,22 +286,10 @@ def _modbus_read(client_link):
         for i, bit in enumerate(bits):
             print(f"Bit {i}: {'ON' if bit else 'OFF'}")
 
-def _changeValueExposureTime(value):
-    global ExposureTime
-    ExposureTime = value
-    print(ExposureTime)
-
-def _changeValueGain(value):
-    global Gain
-    Gain = value
-    print(Gain)
-
-
 def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_frame = hikcam_link.get_one_frame()
     lable_detection = cnnyolo_link.object_detection(lable_frame)
     lable_link.setPixmap(lable_detection)
-
 
 
 if __name__ == "__main__":
@@ -511,14 +299,10 @@ if __name__ == "__main__":
 
     hikCamera1 = HikCam(10)
     hikCamera1.update_cam_list()
-    #hikCamera1.create_cam_handle_open_setting_start_grab()
 
     cnn1 = CnnYolo()
     cnn1.check_envir()
     cnn1.create_model()
-
-    ExposureTime = 2000
-    Gain = 1.0
 
     window = QMainWindow()
     ui = Ui_MainWindow()  # Создаем экземпляр UI
@@ -531,18 +315,18 @@ if __name__ == "__main__":
     timer = QTimer()
     timer.setInterval(10)
 
-    #timer.timeout.connect(lambda:update_frame(hikCamera1,cnn1,ui.label))
+    ui.pushButtonDisconectCam.setEnabled(False)
 
     ui.pushButtonConnectCam.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
     ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
 
     ui.gain_doubleSpinBox.setRange(0.0,20.0)
-    ui.gain_doubleSpinBox.setValue(Gain)
-    ui.gain_doubleSpinBox.valueChanged.connect(_changeValueGain)
+    #ui.gain_doubleSpinBox.setValue(Gain)
+    #ui.gain_doubleSpinBox.valueChanged.connect(_changeValueGain)
 
     ui.exposureTime_spinBox.setRange(0,20000)
-    ui.exposureTime_spinBox.setValue(ExposureTime)
-    ui.exposureTime_spinBox.valueChanged.connect(_changeValueExposureTime)
+    #ui.exposureTime_spinBox.setValue(ExposureTime)
+    #ui.exposureTime_spinBox.valueChanged.connect(_changeValueExposureTime)
 
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:timer.start())
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
@@ -550,4 +334,3 @@ if __name__ == "__main__":
     timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
 
     sys.exit(app.exec())
-
