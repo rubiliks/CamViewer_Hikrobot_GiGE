@@ -503,6 +503,7 @@ def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_link.setPixmap(lable_detection)
 
 
+
 if __name__ == "__main__":
 
     #Qt app create
@@ -527,8 +528,13 @@ if __name__ == "__main__":
     window.minimumSize()
     window.show()
 
-    ui.pushButtonConnectDisconect.clicked.connect(lambda:hikCamera1.close_grab_destroy_handle())
-    ui.pushButtonStartStopGrab.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
+    timer = QTimer()
+    timer.setInterval(10)
+
+    #timer.timeout.connect(lambda:update_frame(hikCamera1,cnn1,ui.label))
+
+    ui.pushButtonConnectCam.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
+    ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
 
     ui.gain_doubleSpinBox.setRange(0.0,20.0)
     ui.gain_doubleSpinBox.setValue(Gain)
@@ -538,10 +544,10 @@ if __name__ == "__main__":
     ui.exposureTime_spinBox.setValue(ExposureTime)
     ui.exposureTime_spinBox.valueChanged.connect(_changeValueExposureTime)
 
-    timer = QTimer()
-    timer.setInterval(10)
-    #timer.timeout.connect(lambda:update_frame(hikCamera1,cnn1,ui.label))
-    timer.start()
+    ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:timer.start())
+    ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
+
+    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
 
     sys.exit(app.exec())
 
