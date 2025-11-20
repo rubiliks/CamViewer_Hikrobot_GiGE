@@ -4,10 +4,11 @@ import time
 
 import logging
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QMainWindow, QPushButton
 from PySide6.QtGui import QPixmap, QImage
 from PySide6.QtCore import QTimer
+from sympy import false
 
 from MvCameraControl_class import *
 
@@ -20,8 +21,10 @@ from ultralytics import YOLO
 from mainWindowSmir import Ui_MainWindow
 
 
-class HikCam():
+class HikCam(QObject):
+    value_changed = Signal(int)
     def __init__(self,number):
+        super().__init__()
         self.number = number
         self.cam = MvCamera()
         MvCamera.MV_CC_Initialize()
@@ -31,6 +34,7 @@ class HikCam():
         self.stDeviceList = 0
         self.ExposureTime = 10000
         self.Gain = 2.0
+        self.cam_now_connect = false
 
     def update_cam_list(self):
         ret = self.cam.MV_CC_EnumDevices(MV_GIGE_DEVICE, self.deviceList)
@@ -134,6 +138,10 @@ class HikCam():
             sys.exit()
         else:
             print("start grabbing ")
+            self.value_changed.emit(10)
+
+
+
 
     def get_one_frame(self):
         stOutFrame = MV_FRAME_OUT()  # переменная выходного фрейм  тип данных
@@ -291,6 +299,9 @@ def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_detection = cnnyolo_link.object_detection(lable_frame)
     lable_link.setPixmap(lable_detection)
 
+def test(value):
+    print('test signal',value)
+
 
 if __name__ == "__main__":
 
@@ -332,5 +343,7 @@ if __name__ == "__main__":
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
 
     timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
+
+    hikCamera1.value_changed.connect(test)
 
     sys.exit(app.exec())
