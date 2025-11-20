@@ -22,7 +22,8 @@ from mainWindowSmir import Ui_MainWindow
 
 
 class HikCam(QObject):
-    value_changed = Signal(int)
+    cam_connect_signal = Signal(bool)
+    cam_disconnect_signal = Signal(bool)
     def __init__(self,number):
         super().__init__()
         self.number = number
@@ -59,7 +60,6 @@ class HikCam(QObject):
                 print("current ip: %d.%d.%d.%d\n" % (nip1, nip2, nip3, nip4))
 
     def create_cam_handle_open_setting_start_grab(self):
-
         # _update_cam_list
         if int(self.nConnectionNum) >= self.deviceList.nDeviceNum:
             print("intput error!")
@@ -138,10 +138,8 @@ class HikCam(QObject):
             sys.exit()
         else:
             print("start grabbing ")
-            self.value_changed.emit(10)
-
-
-
+            self.cam_connect_signal.emit(True)
+            self.cam_disconnect_signal.emit(False)
 
     def get_one_frame(self):
         stOutFrame = MV_FRAME_OUT()  # переменная выходного фрейм  тип данных
@@ -199,6 +197,8 @@ class HikCam(QObject):
             sys.exit()
         else:
             print("handle destroy")
+            self.cam_connect_signal.emit(False)
+            self.cam_disconnect_signal.emit(True)
 
 class CnnYolo():
     def __init__(self):
@@ -299,7 +299,7 @@ def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_detection = cnnyolo_link.object_detection(lable_frame)
     lable_link.setPixmap(lable_detection)
 
-def test(value):
+def test(value,):
     print('test signal',value)
 
 
@@ -326,7 +326,7 @@ if __name__ == "__main__":
     timer = QTimer()
     timer.setInterval(10)
 
-    ui.pushButtonDisconectCam.setEnabled(False)
+    #ui.pushButtonDisconectCam.setEnabled(False)
 
     ui.pushButtonConnectCam.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
     ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
@@ -344,6 +344,7 @@ if __name__ == "__main__":
 
     timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
 
-    hikCamera1.value_changed.connect(test)
+    hikCamera1.cam_connect_signal.connect(ui.pushButtonDisconectCam.setEnabled)
+    hikCamera1.cam_disconnect_signal.connect(ui.pushButtonConnectCam.setEnabled)
 
     sys.exit(app.exec())
