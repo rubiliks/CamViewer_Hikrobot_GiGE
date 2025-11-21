@@ -16,8 +16,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QDoubleSpinBox, QGridLayout, QGroupBox,
-    QLabel, QMainWindow, QPushButton, QSizePolicy,
-    QSpacerItem, QSpinBox, QVBoxLayout, QWidget)
+    QLabel, QMainWindow, QProgressBar, QPushButton,
+    QSizePolicy, QSpacerItem, QSpinBox, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -50,6 +51,16 @@ class Ui_MainWindow(object):
         self.groupBoxButton.setMaximumSize(QSize(210, 16777215))
         self.verticalLayout_2 = QVBoxLayout(self.groupBoxButton)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.cameraStatusProgressBar = QProgressBar(self.groupBoxButton)
+        self.cameraStatusProgressBar.setObjectName(u"cameraStatusProgressBar")
+        self.cameraStatusProgressBar.setValue(100)
+        self.cameraStatusProgressBar.setTextVisible(False)
+        self.cameraStatusProgressBar.setOrientation(Qt.Orientation.Horizontal)
+        self.cameraStatusProgressBar.setInvertedAppearance(False)
+        self.cameraStatusProgressBar.setTextDirection(QProgressBar.Direction.TopToBottom)
+
+        self.verticalLayout_2.addWidget(self.cameraStatusProgressBar)
+
         self.pushButtonConnectCam = QPushButton(self.groupBoxButton)
         self.pushButtonConnectCam.setObjectName(u"pushButtonConnectCam")
 
@@ -128,6 +139,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Camera view", None))
         self.groupBoxButton.setTitle(QCoreApplication.translate("MainWindow", u"Camera control", None))
+        self.cameraStatusProgressBar.setFormat(QCoreApplication.translate("MainWindow", u"%p%", None))
         self.pushButtonConnectCam.setText(QCoreApplication.translate("MainWindow", u"Connect Cam", None))
         self.pushButtonDisconectCam.setText(QCoreApplication.translate("MainWindow", u"Disconect Cam", None))
         self.cnn_control_label.setText(QCoreApplication.translate("MainWindow", u"CNN control", None))

@@ -22,8 +22,7 @@ from mainWindowSmir import Ui_MainWindow
 
 
 class HikCam(QObject):
-    cam_connect_signal = Signal(bool)
-    cam_disconnect_signal = Signal(bool)
+    cam_сon_discon_sig =Signal()
     def __init__(self,number):
         super().__init__()
         self.number = number
@@ -138,8 +137,7 @@ class HikCam(QObject):
             sys.exit()
         else:
             print("start grabbing ")
-            self.cam_connect_signal.emit(True)
-            self.cam_disconnect_signal.emit(False)
+            self.cam_сon_discon_sig.emit()
 
     def get_one_frame(self):
         stOutFrame = MV_FRAME_OUT()  # переменная выходного фрейм  тип данных
@@ -197,8 +195,7 @@ class HikCam(QObject):
             sys.exit()
         else:
             print("handle destroy")
-            self.cam_connect_signal.emit(False)
-            self.cam_disconnect_signal.emit(True)
+            self.cam_сon_discon_sig.emit()
 
 class CnnYolo():
     def __init__(self):
@@ -299,8 +296,30 @@ def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_detection = cnnyolo_link.object_detection(lable_frame)
     lable_link.setPixmap(lable_detection)
 
-def test(value,):
-    print('test signal',value)
+def cam_status_block_button_ui(ui_link):
+    if ui_link.cameraStatusProgressBar.value() == 0:
+        ui_link.cameraStatusProgressBar.setValue(100)
+    else:
+        ui_link.cameraStatusProgressBar.setValue(0)
+
+    if ui_link.pushButtonDisconectCam.isEnabled():
+        ui_link.pushButtonDisconectCam.setEnabled(False)
+    else:ui_link.pushButtonDisconectCam.setEnabled(True)
+
+    if ui_link.pushButtonConnectCam.isEnabled():
+        ui_link.pushButtonConnectCam.setEnabled(False)
+    else:ui_link.pushButtonConnectCam.setEnabled(True)
+
+    if ui_link.gain_doubleSpinBox.isEnabled():
+        ui_link.gain_doubleSpinBox.setEnabled(False)
+    else:
+        ui_link.gain_doubleSpinBox.setEnabled(True)
+
+    if ui_link.exposureTime_spinBox.isEnabled():
+        ui_link.exposureTime_spinBox.setEnabled(False)
+    else:
+        ui_link.exposureTime_spinBox.setEnabled(True)
+
 
 
 if __name__ == "__main__":
@@ -344,7 +363,13 @@ if __name__ == "__main__":
 
     timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
 
-    hikCamera1.cam_connect_signal.connect(ui.pushButtonDisconectCam.setEnabled)
-    hikCamera1.cam_disconnect_signal.connect(ui.pushButtonConnectCam.setEnabled)
+    #hikCamera1.cam_connect_signal.connect(ui.pushButtonDisconectCam.setEnabled)
+    #hikCamera1.cam_disconnect_signal.connect(ui.pushButtonConnectCam.setEnabled)
+
+    hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))
+
+    ui.pushButtonDisconectCam.setEnabled(False)
+    ui.cameraStatusProgressBar.setValue(0)
+
 
     sys.exit(app.exec())
