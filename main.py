@@ -1,8 +1,8 @@
 import numpy as np
 import cv2
 import time
-
 import logging
+
 
 from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QMainWindow, QPushButton
@@ -23,16 +23,15 @@ from mainWindowSmir import Ui_MainWindow
 
 class HikCam(QObject):
     cam_сon_discon_sig =Signal()
-    def __init__(self,number):
+    def __init__(self):
         super().__init__()
-        self.number = number
         self.cam = MvCamera()
         MvCamera.MV_CC_Initialize()
         self.nConnectionNum = 0
         self.deviceList = MV_CC_DEVICE_INFO_LIST()
         self.mem_connect = False
         self.stDeviceList = 0
-        self.ExposureTime = 10000
+        self.ExposureTime = 5000
         self.Gain = 2.0
         self.cam_now_connect = false
 
@@ -197,6 +196,12 @@ class HikCam(QObject):
             print("handle destroy")
             self.cam_сon_discon_sig.emit()
 
+    def get_exposure(self,value):
+        self.ExposureTime =  value
+
+    def get_gain(self,value):
+        self.Gain = value
+
 class CnnYolo():
     def __init__(self):
         self.model = 0
@@ -321,55 +326,44 @@ def cam_status_block_button_ui(ui_link):
         ui_link.exposureTime_spinBox.setEnabled(True)
 
 
-
 if __name__ == "__main__":
 
-    #Qt app create
+    #Qt создание приложение
     app = QApplication(sys.argv)
-
-    hikCamera1 = HikCam(10)
+    #Экземпляр класса камеры
+    hikCamera1 = HikCam()
     hikCamera1.update_cam_list()
-
+    #Экземпляр класса нейроной сети
     cnn1 = CnnYolo()
     cnn1.check_envir()
     cnn1.create_model()
-
+    #Экземпляр ui
     window = QMainWindow()
-    ui = Ui_MainWindow()  # Создаем экземпляр UI
-    ui.setupUi(window)  # Настраиваем окно через UI
-
+    ui = Ui_MainWindow()  #
+    ui.setupUi(window)
     window.setWindowTitle("Hikrobot Camera Viewer")
     window.minimumSize()
     window.show()
-
+    #экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(10)
-
-    #ui.pushButtonDisconectCam.setEnabled(False)
-
+    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
+    #Cоеднение ui кнопок камеры
     ui.pushButtonConnectCam.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
     ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
-
+    # Cоеднение ui настроек камеры
     ui.gain_doubleSpinBox.setRange(0.0,20.0)
-    #ui.gain_doubleSpinBox.setValue(Gain)
-    #ui.gain_doubleSpinBox.valueChanged.connect(_changeValueGain)
-
+    ui.gain_doubleSpinBox.setValue(2.0)
+    ui.gain_doubleSpinBox.valueChanged.connect(hikCamera1.get_gain)
     ui.exposureTime_spinBox.setRange(0,20000)
-    #ui.exposureTime_spinBox.setValue(ExposureTime)
-    #ui.exposureTime_spinBox.valueChanged.connect(_changeValueExposureTime)
-
-    ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:timer.start())
-    ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
-
-    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
-
-    #hikCamera1.cam_connect_signal.connect(ui.pushButtonDisconectCam.setEnabled)
-    #hikCamera1.cam_disconnect_signal.connect(ui.pushButtonConnectCam.setEnabled)
-
-    hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))
-
+    ui.exposureTime_spinBox.setValue(5000)
+    ui.exposureTime_spinBox.valueChanged.connect(hikCamera1.get_exposure)
     ui.pushButtonDisconectCam.setEnabled(False)
     ui.cameraStatusProgressBar.setValue(0)
-
+    # Соединение кнопок нейросети
+    ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:timer.start())
+    ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
+    # Соединение состояния камеры с блокировкой кнопок
+    hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))
 
     sys.exit(app.exec())
