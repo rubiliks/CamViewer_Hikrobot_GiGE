@@ -9,7 +9,7 @@ from ultralytics import YOLO
 class CnnYolo():
     def __init__(self):
         self.model = 0
-        self.modelEnginePath ='./resurse/EMG_2025_24_06_v1.pt'
+        self.modelEnginePath ='./resurse/EMG_2025_24_06_v1.engine'
 
     def create_model(self):
         self.model = YOLO(self.modelEnginePath)

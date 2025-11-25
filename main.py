@@ -3,37 +3,11 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QTimer
 
 from MvCameraControl_class import *
-from pymodbus.client import ModbusTcpClient
 
-from mainWindowSmir import Ui_MainWindow
+from modules_py.mainWindowSmir import Ui_MainWindow
 from modules_py.HikCam import  HikCam
 from modules_py.CnnYolo import  CnnYolo
 
-
-def _modbus_connect():
-    client_link = ModbusTcpClient(
-        host='192.168.4.176',  # IP-адрес устройства
-        port=502,  # Стандартный порт Modbus TCP
-        timeout=3,  # Таймаут в секундах
-        retries=3  # Количество попыток переподключения
-    )
-    return  client_link
-
-def _modbus_read(client_link):
-    if client_link.connect():
-        print("Успешное подключение modbus")
-    result = client_link.read_discrete_inputs(
-        address=0,  # Начальный адрес
-        count=8,  # Количество битов (8 bits)
-        device_id=1  # ID устройства
-    )
-
-    if not result.isError():
-        bits = result.bits[:8]
-        print(f"Input bits: {bits}")
-        print("Состояние input bits:")
-        for i, bit in enumerate(bits):
-            print(f"Bit {i}: {'ON' if bit else 'OFF'}")
 
 def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_frame = hikcam_link.get_one_frame()
