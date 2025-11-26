@@ -1,82 +1,48 @@
+import sys
 
-from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication, QMainWindow
 
-from MvCameraControl_class import *
-
-from modules_py.mainWindowSmir import Ui_MainWindow
-from modules_py.HikCam import  HikCam
-from modules_py.CnnYolo import  CnnYolo
-
-
-def update_frame(hikcam_link,cnnyolo_link,lable_link):
-    lable_frame = hikcam_link.get_one_frame()
-    lable_detection = cnnyolo_link.object_detection(lable_frame)
-    lable_link.setPixmap(lable_detection)
-
-def cam_status_block_button_ui(ui_link):
-    if ui_link.cameraStatusProgressBar.value() == 0:
-        ui_link.cameraStatusProgressBar.setValue(100)
-    else:
-        ui_link.cameraStatusProgressBar.setValue(0)
-
-    if ui_link.pushButtonDisconectCam.isEnabled():
-        ui_link.pushButtonDisconectCam.setEnabled(False)
-    else:ui_link.pushButtonDisconectCam.setEnabled(True)
-
-    if ui_link.pushButtonConnectCam.isEnabled():
-        ui_link.pushButtonConnectCam.setEnabled(False)
-    else:ui_link.pushButtonConnectCam.setEnabled(True)
-
-    if ui_link.gain_doubleSpinBox.isEnabled():
-        ui_link.gain_doubleSpinBox.setEnabled(False)
-    else:
-        ui_link.gain_doubleSpinBox.setEnabled(True)
-
-    if ui_link.exposureTime_spinBox.isEnabled():
-        ui_link.exposureTime_spinBox.setEnabled(False)
-    else:
-        ui_link.exposureTime_spinBox.setEnabled(True)
-
+from src.application import Application
+from src.cnn_yolo import CnnYolo
+from src.hik_cam import HikCam
 
 if __name__ == "__main__":
 
-    #Qt создание приложение
-    app = QApplication(sys.argv)
-    #Экземпляр класса камеры
+    app = Application()
+
+    # Экземпляр класса камеры
     hikCamera1 = HikCam()
     hikCamera1.update_cam_list()
-    #Экземпляр класса нейроной сети
+
+    # Экземпляр класса нейроной сети
     cnn1 = CnnYolo()
     cnn1.check_envir()
     cnn1.create_model()
-    #Экземпляр ui
-    window = QMainWindow()
-    ui = Ui_MainWindow()  #
-    ui.setupUi(window)
-    window.setWindowTitle("Hikrobot Camera Viewer")
-    window.minimumSize()
-    window.show()
-    #экземпляр таймера для получения кадра с камеры
+
+    # экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(30)
-    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
-    #Cоеднение ui кнопок камеры
-    ui.pushButtonConnectCam.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
-    ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
+    timer.timeout.connect(lambda: app._update_frame(hikCamera1, cnn1, app.ui.label))
+
+    # Cоеднение ui кнопок камеры
+    app.ui.pushButtonConnectCam.clicked.connect(
+        lambda: hikCamera1.create_cam_handle_open_setting_start_grab()
+    )
+    app.ui.pushButtonDisconectCam.clicked.connect(
+        lambda: hikCamera1.close_grab_destroy_handle()
+    )
     # Cоеднение ui настроек камеры
-    ui.gain_doubleSpinBox.setRange(0.0,20.0)
-    ui.gain_doubleSpinBox.setValue(2.0)
-    ui.gain_doubleSpinBox.valueChanged.connect(hikCamera1.get_gain)
-    ui.exposureTime_spinBox.setRange(0,20000)
-    ui.exposureTime_spinBox.setValue(5000)
-    ui.exposureTime_spinBox.valueChanged.connect(hikCamera1.get_exposure)
-    ui.pushButtonDisconectCam.setEnabled(False)
-    ui.cameraStatusProgressBar.setValue(0)
+    app.ui.gain_doubleSpinBox.valueChanged.connect(hikCamera1.get_gain)
+    app.ui.exposureTime_spinBox.valueChanged.connect(hikCamera1.get_exposure)
+
     # Соединение кнопок нейросети
-    ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:timer.start())
-    ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
+    app.ui.pushButtonStartObjDetectCnn.clicked.connect(lambda: timer.start())
+    app.ui.pushButtonStopObjDetectCnn.clicked.connect(lambda: timer.stop())
+
     # Соединение состояния камеры с блокировкой кнопок
-    hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))
+    hikCamera1.cam_сon_discon_sig.connect(
+        lambda: app._cam_status_block_button_ui(app.ui)
+    )
 
     sys.exit(app.exec())
