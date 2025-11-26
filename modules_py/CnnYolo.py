@@ -24,6 +24,28 @@ class CnnYolo():
         annotated_frame = results[0].plot()
         annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
 
+        for result in results:
+            boxes = result.boxes  # Boxes object
+
+            # Извлечение координат, confidence scores и классов
+            for box in boxes:
+                # Координаты в формате [x1, y1, x2, y2]
+                x1, y1, x2, y2 = box.xyxy[0].tolist()
+
+                # Координаты в формате [x_center, y_center, width, height] (нормализованные)
+                x_center, y_center, width, height = box.xywh[0].tolist()
+
+                # Confidence score
+                confidence = box.conf[0].item()
+
+                # Класс объекта
+                class_id = box.cls[0].item()
+                class_name = self.model.names[class_id]
+
+                print(f"Объект: {class_name}")
+                print(f"Координаты: [{x1:.2f}, {y1:.2f}, {x2:.2f}, {y2:.2f}]")
+                print(f"Confidence: {confidence:.2f}")
+
         end_time = time.time()
         execution_time = end_time - start_time
         fps = 1 / execution_time

@@ -59,7 +59,7 @@ if __name__ == "__main__":
     window.show()
     #экземпляр таймера для получения кадра с камеры
     timer = QTimer()
-    timer.setInterval(10)
+    timer.setInterval(30)
     timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
     #Cоеднение ui кнопок камеры
     ui.pushButtonConnectCam.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
