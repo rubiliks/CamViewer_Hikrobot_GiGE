@@ -11,6 +11,7 @@ class CnnYolo():
     def __init__(self):
         self.model = 0
         self.modelEnginePath ='./resurse/EMG_2025_24_06_v1.engine'
+        self.obj_list =[]
 
 
     def create_model(self):
@@ -18,6 +19,7 @@ class CnnYolo():
 
     def object_detection(self,image):
         start_time = time.time()
+        self.obj_list.clear()
         img_color_rbb = image
         heightImg, widthImg, channelsImg = img_color_rbb.shape
         bytes_per_lineImg = channelsImg * widthImg
@@ -25,8 +27,6 @@ class CnnYolo():
         results = self.model(img_color_rbb)
         annotated_frame = results[0].plot()
         annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
-
-
         counter_obj = 0
         for result in results:
             boxes = result.boxes  # Boxes object
@@ -54,22 +54,22 @@ class CnnYolo():
                     "counter_obj":counter_obj,
                     "timestamp": datetime.now().isoformat()
                 }
+                self.obj_list.append(obj_data)
 
                 x_center_circle = int(x_center)
                 y_center_circle = int(y_center)
-                cv2.circle(annotated_frame,(x_center_circle,y_center_circle),5,(0, 0, 255), 2)
                 counter_obj = counter_obj + 1
 
+                cv2.circle(annotated_frame,(x_center_circle,y_center_circle),5,(0, 0, 255), 2)
+                cv2.putText(annotated_frame, str(counter_obj), (x_center_circle, y_center_circle), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         end_time = time.time()
         execution_time = end_time - start_time
         fps = 1 / execution_time
-        cv2.putText(annotated_frame, f"FPS: {fps:.2f}", (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
+        cv2.putText(annotated_frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         q_image = QImage(annotated_frame.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
         q_pixmap = QPixmap.fromImage(q_image)
         q_pixmap2 = q_pixmap.copy()
-        return q_pixmap2, obj_data
+        return q_pixmap2, self.obj_list
 
     def check_envir(self):
         # Checking the environment
