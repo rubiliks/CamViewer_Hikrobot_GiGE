@@ -13,7 +13,6 @@ class CnnYolo():
         self.modelEnginePath ='./resurse/EMG_2025_24_06_v1.engine'
         self.obj_list =[]
 
-
     def create_model(self):
         self.model = YOLO(self.modelEnginePath)
 
@@ -60,8 +59,8 @@ class CnnYolo():
                 y_center_circle = int(y_center)
                 counter_obj = counter_obj + 1
 
-                cv2.circle(annotated_frame,(x_center_circle,y_center_circle),5,(0, 0, 255), 2)
-                cv2.putText(annotated_frame, str(counter_obj), (x_center_circle, y_center_circle), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                cv2.circle(annotated_frame,(x_center_circle,y_center_circle),5,(0, 255, 0), 2)
+                cv2.putText(annotated_frame, str(counter_obj), (x_center_circle, y_center_circle-15), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         end_time = time.time()
         execution_time = end_time - start_time
         fps = 1 / execution_time
