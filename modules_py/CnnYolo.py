@@ -5,11 +5,13 @@ import torch
 
 from PySide6.QtGui import QPixmap, QImage
 from ultralytics import YOLO
+from datetime import datetime
 
 class CnnYolo():
     def __init__(self):
         self.model = 0
         self.modelEnginePath ='./resurse/EMG_2025_24_06_v1.engine'
+
 
     def create_model(self):
         self.model = YOLO(self.modelEnginePath)
@@ -24,27 +26,39 @@ class CnnYolo():
         annotated_frame = results[0].plot()
         annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
 
+
+        counter_obj = 0
         for result in results:
             boxes = result.boxes  # Boxes object
-
             # Извлечение координат, confidence scores и классов
             for box in boxes:
+                obj_data = {}
                 # Координаты в формате [x1, y1, x2, y2]
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
-
                 # Координаты в формате [x_center, y_center, width, height] (нормализованные)
                 x_center, y_center, width, height = box.xywh[0].tolist()
-
                 # Confidence score
                 confidence = box.conf[0].item()
-
                 # Класс объекта
                 class_id = box.cls[0].item()
                 class_name = self.model.names[class_id]
+                # Данные объекта
+                obj_data = {
+                    "x_center": x_center,
+                    "y_center": y_center,
+                    "width": width,
+                    "height": height,
+                    "confidence": confidence,
+                    "class_id": class_id,
+                    "class_name": class_name,
+                    "counter_obj":counter_obj,
+                    "timestamp": datetime.now().isoformat()
+                }
 
-                print(f"Объект: {class_name}")
-                print(f"Координаты: [{x1:.2f}, {y1:.2f}, {x2:.2f}, {y2:.2f}]")
-                print(f"Confidence: {confidence:.2f}")
+                x_center_circle = int(x_center)
+                y_center_circle = int(y_center)
+                cv2.circle(annotated_frame,(x_center_circle,y_center_circle),5,(0, 0, 255), 2)
+                counter_obj = counter_obj + 1
 
         end_time = time.time()
         execution_time = end_time - start_time
@@ -55,7 +69,7 @@ class CnnYolo():
         q_image = QImage(annotated_frame.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
         q_pixmap = QPixmap.fromImage(q_image)
         q_pixmap2 = q_pixmap.copy()
-        return q_pixmap2
+        return q_pixmap2, obj_data
 
     def check_envir(self):
         # Checking the environment

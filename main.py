@@ -11,7 +11,8 @@ from modules_py.CnnYolo import  CnnYolo
 
 def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_frame = hikcam_link.get_one_frame()
-    lable_detection = cnnyolo_link.object_detection(lable_frame)
+    lable_detection,obj_cnn_data = cnnyolo_link.object_detection(lable_frame)
+    print(obj_cnn_data)
     lable_link.setPixmap(lable_detection)
 
 def cam_status_block_button_ui(ui_link):
