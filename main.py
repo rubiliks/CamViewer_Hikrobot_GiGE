@@ -8,6 +8,10 @@ from modules_py.mainWindowSmir import Ui_MainWindow
 from modules_py.HikCam import  HikCam
 from modules_py.CnnYolo import  CnnYolo
 
+import logging
+logging.basicConfig(filename='CamViewer_Hikrobot_GiGE.log', level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 
 def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_frame = hikcam_link.get_one_frame()
@@ -42,7 +46,7 @@ def cam_status_block_button_ui(ui_link):
 
 
 if __name__ == "__main__":
-
+    logger.info("Start app")
     #Qt создание приложение
     app = QApplication(sys.argv)
     #Экземпляр класса камеры
@@ -80,5 +84,6 @@ if __name__ == "__main__":
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
     # Соединение состояния камеры с блокировкой кнопок
     hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))
+    logger.info("App started")
 
     sys.exit(app.exec())

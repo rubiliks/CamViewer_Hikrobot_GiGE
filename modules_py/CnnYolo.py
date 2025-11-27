@@ -7,6 +7,7 @@ from PySide6.QtGui import QPixmap, QImage
 from ultralytics import YOLO
 from datetime import datetime
 
+logger = logging.getLogger(__name__)
 class CnnYolo():
     def __init__(self):
         self.model = 0
@@ -17,6 +18,7 @@ class CnnYolo():
         self.model = YOLO(self.modelEnginePath)
 
     def object_detection(self,image):
+        logger.error("object_detection")
         start_time = time.time()
         self.obj_list.clear()
         img_color_rbb = image
