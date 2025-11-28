@@ -11,11 +11,19 @@ logger = logging.getLogger(__name__)
 class CnnYolo():
     def __init__(self):
         self.model = 0
-        self.modelEnginePath ='./resurse/EMG_2025_24_06_v1.engine'
+        self.modelEnginePath =''
         self.obj_list =[]
 
-    def create_model(self):
-        self.model = YOLO(self.modelEnginePath)
+    def create_model(self,modelPath):
+        if (len(modelPath) != 0 ):
+            try:
+                self.modelEnginePath = modelPath
+                self.model = YOLO(self.modelEnginePath)
+                logger.info("CNN created")
+            except ValueError:
+                logger.error(f"CNN create error {ValueError}")
+        else:
+            logger.error("CNN modelPath empty path")
 
     def object_detection(self,image):
         if(image.size>0 and (image  is not  None)):
@@ -72,38 +80,10 @@ class CnnYolo():
     def check_envir(self):
         # Checking the environment
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        print(f"Using device: {device}")
-        print(f"PyTorch version: {torch.__version__}")
-        print(f"CUDA available: {torch.cuda.is_available()}")
-        print(f"CUDA version: {torch.version.cuda}")
-        print(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
+        logger.info(f"Using device: {device}")
+        logger.info(f"PyTorch version: {torch.__version__}")
+        logger.info(f"CUDA available: {torch.cuda.is_available()}")
+        logger.info(f"CUDA version: {torch.version.cuda}")
+        logger.info(f"GPU device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'None'}")
 
-class Logger:
-    def __init__(self, name: str = __name__):
-        self._setup_logging()
-        self.logger = logging.getLogger(name)
 
-    def _setup_logging(self):
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler('app.log'),
-                logging.StreamHandler()
-            ]
-        )
-
-    def debug(self, message: str):
-        self.logger.debug(message)
-
-    def info(self, message: str):
-        self.logger.info(message)
-
-    def warning(self, message: str):
-        self.logger.warning(message)
-
-    def error(self, message: str):
-        self.logger.error(message)
-
-    def critical(self, message: str):
-        self.logger.critical(message)

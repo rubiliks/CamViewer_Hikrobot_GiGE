@@ -2,7 +2,6 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QTimer
 
 from MvImport.MvCameraControl_class import *
-
 from modules_py.mainWindowSmir import Ui_MainWindow
 from modules_py.HikCam import  HikCam
 from modules_py.CnnYolo import  CnnYolo
@@ -15,7 +14,6 @@ logger = logging.getLogger(__name__)
 def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_frame = hikcam_link.get_one_frame()
     lable_detection,objs_cnn_data = cnnyolo_link.object_detection(lable_frame)
-
     lable_link.setPixmap(lable_detection)
 
 def cam_status_block_button_ui(ui_link):
@@ -53,15 +51,15 @@ if __name__ == "__main__":
     #Экземпляр класса нейроной сети
     cnn1 = CnnYolo()
     cnn1.check_envir()
-    cnn1.create_model()
+    cnn1.create_model('./resurse/EMG_2025_24_06_v1.engine')
     #Экземпляр ui
     window = QMainWindow()
-    ui = Ui_MainWindow()  #
+    ui = Ui_MainWindow()
     ui.setupUi(window)
     window.setWindowTitle("Hikrobot Camera Viewer")
     window.minimumSize()
     window.show()
-    #экземпляр таймера для получения кадра с камеры
+    #Экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(30)
     timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
@@ -85,4 +83,3 @@ if __name__ == "__main__":
     logger.info("App started")
 
     sys.exit(app.exec())
-

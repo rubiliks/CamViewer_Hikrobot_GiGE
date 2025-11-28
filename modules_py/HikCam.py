@@ -35,14 +35,14 @@ class HikCam(QObject):
         for i in range(0, self.deviceList.nDeviceNum):
             mvcc_dev_info = cast(self.deviceList.pDeviceInfo[i], POINTER(MV_CC_DEVICE_INFO)).contents
             if mvcc_dev_info.nTLayerType == MV_GIGE_DEVICE or mvcc_dev_info.nTLayerType == MV_GENTL_GIGE_DEVICE:
-                logger.info("\ngige device: [%d]" % i)
+                logger.info("gige device: [%d]" % i)
                 strModeName = ''.join([chr(c) for c in mvcc_dev_info.SpecialInfo.stGigEInfo.chModelName if c != 0])
                 logger.info("device model name: %s" % strModeName)
                 nip1 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0xff000000) >> 24)
                 nip2 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x00ff0000) >> 16)
                 nip3 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x0000ff00) >> 8)
                 nip4 = (mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x000000ff)
-                logger.info("current ip: %d.%d.%d.%d\n" % (nip1, nip2, nip3, nip4))
+                logger.info("current ip: %d.%d.%d.%d" % (nip1, nip2, nip3, nip4))
 
     def create_cam_handle_open_setting_start_grab(self):
         # _update_cam_list
