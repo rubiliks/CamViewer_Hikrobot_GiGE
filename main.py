@@ -1,23 +1,21 @@
-
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QTimer
 
-from MvCameraControl_class import *
+from MvImport.MvCameraControl_class import *
 
 from modules_py.mainWindowSmir import Ui_MainWindow
 from modules_py.HikCam import  HikCam
 from modules_py.CnnYolo import  CnnYolo
 
 import logging
-logging.basicConfig(filename='CamViewer_Hikrobot_GiGE.log', level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='CamViewer_Hikrobot_GiGE.log', level=logging.INFO,format='%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
 def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_frame = hikcam_link.get_one_frame()
     lable_detection,objs_cnn_data = cnnyolo_link.object_detection(lable_frame)
-    for obj in objs_cnn_data:
-        print(obj)
+
     lable_link.setPixmap(lable_detection)
 
 def cam_status_block_button_ui(ui_link):
@@ -87,3 +85,4 @@ if __name__ == "__main__":
     logger.info("App started")
 
     sys.exit(app.exec())
+
