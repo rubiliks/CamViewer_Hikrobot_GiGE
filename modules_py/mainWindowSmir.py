@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDoubleSpinBox, QGridLayout, QGroupBox,
-    QLabel, QMainWindow, QProgressBar, QPushButton,
-    QSizePolicy, QSpacerItem, QSpinBox, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QDoubleSpinBox, QFrame, QGridLayout,
+    QGroupBox, QLabel, QMainWindow, QProgressBar,
+    QPushButton, QSizePolicy, QSpacerItem, QSpinBox,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -51,6 +51,23 @@ class Ui_MainWindow(object):
         self.groupBoxButton.setMaximumSize(QSize(210, 16777215))
         self.verticalLayout_2 = QVBoxLayout(self.groupBoxButton)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.Cam_find_label = QLabel(self.groupBoxButton)
+        self.Cam_find_label.setObjectName(u"Cam_find_label")
+
+        self.verticalLayout_2.addWidget(self.Cam_find_label)
+
+        self.searchCam = QPushButton(self.groupBoxButton)
+        self.searchCam.setObjectName(u"searchCam")
+
+        self.verticalLayout_2.addWidget(self.searchCam)
+
+        self.line = QFrame(self.groupBoxButton)
+        self.line.setObjectName(u"line")
+        self.line.setFrameShape(QFrame.Shape.HLine)
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout_2.addWidget(self.line)
+
         self.cameraStatusProgressBar = QProgressBar(self.groupBoxButton)
         self.cameraStatusProgressBar.setObjectName(u"cameraStatusProgressBar")
         self.cameraStatusProgressBar.setValue(100)
@@ -73,6 +90,13 @@ class Ui_MainWindow(object):
 
         self.CnnLayout = QVBoxLayout()
         self.CnnLayout.setObjectName(u"CnnLayout")
+        self.line_2 = QFrame(self.groupBoxButton)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.Shape.HLine)
+        self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.CnnLayout.addWidget(self.line_2)
+
         self.cnn_control_label = QLabel(self.groupBoxButton)
         self.cnn_control_label.setObjectName(u"cnn_control_label")
 
@@ -139,6 +163,8 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Camera view", None))
         self.groupBoxButton.setTitle(QCoreApplication.translate("MainWindow", u"Camera control", None))
+        self.Cam_find_label.setText(QCoreApplication.translate("MainWindow", u"No find cam", None))
+        self.searchCam.setText(QCoreApplication.translate("MainWindow", u"Search Cam", None))
         self.cameraStatusProgressBar.setFormat(QCoreApplication.translate("MainWindow", u"%p%", None))
         self.pushButtonConnectCam.setText(QCoreApplication.translate("MainWindow", u"Connect Cam", None))
         self.pushButtonDisconectCam.setText(QCoreApplication.translate("MainWindow", u"Disconect Cam", None))

@@ -29,7 +29,7 @@ class HikCam(QObject):
             sys.exit()
         if self.deviceList.nDeviceNum == 0:
             logger.error("find no device!")
-            sys.exit()
+            #sys.exit()
         logger.info("Find %d devices!" % self.deviceList.nDeviceNum)
         # print info for all  gige cam
         for i in range(0, self.deviceList.nDeviceNum):

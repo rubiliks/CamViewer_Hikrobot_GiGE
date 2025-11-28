@@ -7,7 +7,8 @@ from modules_py.HikCam import  HikCam
 from modules_py.CnnYolo import  CnnYolo
 
 import logging
-logging.basicConfig(filename='CamViewer_Hikrobot_GiGE.log', level=logging.INFO,format='%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
+
+logging.basicConfig(filename='CamViewer_Hikrobot_GiGE.log', level=logging.DEBUG,format='%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     #Экземпляр класса камеры
     hikCamera1 = HikCam()
-    hikCamera1.update_cam_list()
+    #hikCamera1.update_cam_list()
     #Экземпляр класса нейроной сети
     cnn1 = CnnYolo()
     cnn1.check_envir()
@@ -64,6 +65,8 @@ if __name__ == "__main__":
     timer.setInterval(30)
     timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
     #Cоеднение ui кнопок камеры
+    ui.searchCam.clicked.connect(lambda:hikCamera1.update_cam_list())
+
     ui.pushButtonConnectCam.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
     ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
     # Cоеднение ui настроек камеры
