@@ -41,8 +41,16 @@ def cam_status_block_button_ui(ui_link):
     else:
         ui_link.exposureTime_spinBox.setEnabled(True)
 
+    if ui_link.searchCam.isEnabled():
+        ui_link.searchCam.setEnabled(False)
+    else:
+        ui_link.searchCam.setEnabled(True)
+
+
 def cam_status_block_serch_came(ui_link):
-    ui_link.pushButtonConnectCam.setEnabled(True)
+    if not ui_link.pushButtonConnectCam.isEnabled():
+        ui_link.pushButtonConnectCam.setEnabled(True)
+        ui_link.Cam_find_label.setText("Cam finded!")
 
 
 if __name__ == "__main__":
@@ -86,7 +94,8 @@ if __name__ == "__main__":
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)
     hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))
-    hikCamera1.cam_finded_camera_sig.connect(lambda:cam_status_block_button_ui(ui))
+    hikCamera1.cam_finded_camera_sig.connect(lambda:cam_status_block_serch_came(ui))
+    ui.Cam_find_label.setText('No Camera Find')
     logger.info("App started")
 
     sys.exit(app.exec())
