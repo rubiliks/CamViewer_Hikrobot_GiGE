@@ -9,7 +9,8 @@ from MvCameraControl_class import *
 logger = logging.getLogger(__name__)
 
 class HikCam(QObject):
-    cam_сon_discon_sig =Signal()
+    cam_сon_discon_sig = Signal()
+    cam_finded_camera_sig = Signal()
     def __init__(self):
         super().__init__()
         self.cam = MvCamera()
@@ -20,7 +21,8 @@ class HikCam(QObject):
         self.stDeviceList = 0
         self.ExposureTime = 5000
         self.Gain = 2.0
-        self.cam_now_connect = false
+        self.cam_now_connect = False
+        self.cam_find = False
 
     def update_cam_list(self):
         ret = self.cam.MV_CC_EnumDevices(MV_GIGE_DEVICE, self.deviceList)
@@ -30,6 +32,8 @@ class HikCam(QObject):
         if self.deviceList.nDeviceNum == 0:
             logger.error("find no device!")
             #sys.exit()
+            self.cam_find = False
+
         logger.info("Find %d devices!" % self.deviceList.nDeviceNum)
         # print info for all  gige cam
         for i in range(0, self.deviceList.nDeviceNum):
@@ -43,6 +47,10 @@ class HikCam(QObject):
                 nip3 = ((mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x0000ff00) >> 8)
                 nip4 = (mvcc_dev_info.SpecialInfo.stGigEInfo.nCurrentIp & 0x000000ff)
                 logger.info("current ip: %d.%d.%d.%d" % (nip1, nip2, nip3, nip4))
+        if self.deviceList.nDeviceNum > 0:
+            self.cam_find = True
+            self.cam_finded_camera_sig.emit()
+
 
     def create_cam_handle_open_setting_start_grab(self):
         # _update_cam_list

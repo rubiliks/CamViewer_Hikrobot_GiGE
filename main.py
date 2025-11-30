@@ -41,6 +41,9 @@ def cam_status_block_button_ui(ui_link):
     else:
         ui_link.exposureTime_spinBox.setEnabled(True)
 
+def cam_status_block_serch_came(ui_link):
+    ui_link.pushButtonConnectCam.setEnabled(True)
+
 
 if __name__ == "__main__":
     logger.info("Start app")
@@ -66,7 +69,6 @@ if __name__ == "__main__":
     timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
     #Cоеднение ui кнопок камеры
     ui.searchCam.clicked.connect(lambda:hikCamera1.update_cam_list())
-
     ui.pushButtonConnectCam.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
     ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
     # Cоеднение ui настроек камеры
@@ -82,7 +84,9 @@ if __name__ == "__main__":
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:timer.start())
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
     # Соединение состояния камеры с блокировкой кнопок
+    ui.pushButtonConnectCam.setEnabled(False)
     hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))
+    hikCamera1.cam_finded_camera_sig.connect(lambda:cam_status_block_button_ui(ui))
     logger.info("App started")
 
     sys.exit(app.exec())
