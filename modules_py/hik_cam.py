@@ -172,7 +172,7 @@ class HikCam(QObject):
                 sys.exit()
             return img_buff
         else:
-            imageError = cv2.imread('./resurse/no_cam_connect.jpg')
+            imageError = cv2.imread('./resources/no_cam_connect.jpg')
             logger.error("no data[0x%x]" % ret)
             return imageError
 

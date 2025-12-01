@@ -2,11 +2,12 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QTimer
 
 from MvImport.MvCameraControl_class import *
-from modules_py.mainWindowSmir import Ui_MainWindow
-from modules_py.HikCam import  HikCam
-from modules_py.CnnYolo import  CnnYolo
+from modules_py.mainWindowSmir_ui import Ui_MainWindow
+from modules_py.hik_cam import  HikCam
+from modules_py.cnn_yolo import  CnnYolo
 
 import logging
+
 
 logging.basicConfig(filename='CamViewer_Hikrobot_GiGE.log', level=logging.DEBUG,format='%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -67,7 +68,7 @@ if __name__ == "__main__":
     #Экземпляр класса нейроной сети
     cnn1 = CnnYolo()
     cnn1.check_envir()
-    cnn1.create_model('./resurse/EMG_2025_24_06_v1.engine')
+    cnn1.create_model('./resources/EMG_2025_24_06_v1.engine')
     #Экземпляр ui
     window = QMainWindow()
     ui = Ui_MainWindow()

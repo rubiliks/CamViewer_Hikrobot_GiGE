@@ -2,7 +2,7 @@ import sys
 
 from PySide6.QtWidgets import QApplication, QMainWindow
 
-from src.ui.mainWindowSmir_ui import Ui_MainWindow
+from modules_py.mainWindowSmir_ui import Ui_MainWindow
 
 
 class Application:
