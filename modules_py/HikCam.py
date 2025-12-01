@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 class HikCam(QObject):
     cam_сon_discon_sig = Signal()
     cam_finded_camera_sig = Signal()
+    cam_not_finded_sig = Signal()
     def __init__(self):
         super().__init__()
         self.cam = MvCamera()
@@ -33,6 +34,7 @@ class HikCam(QObject):
             logger.error("find no device!")
             #sys.exit()
             self.cam_find = False
+            self.cam_not_finded_sig.emit()
 
         logger.info("Find %d devices!" % self.deviceList.nDeviceNum)
         # print info for all  gige cam

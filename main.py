@@ -52,6 +52,10 @@ def cam_status_block_serch_came(ui_link):
         ui_link.pushButtonConnectCam.setEnabled(True)
         ui_link.Cam_find_label.setText("Cam finded!")
 
+def cam_status_not_find_came(ui_link):
+    ui_link.pushButtonConnectCam.setEnabled(False)
+    ui_link.Cam_find_label.setText("Cam not find")
+
 
 if __name__ == "__main__":
     logger.info("Start app")
@@ -95,6 +99,7 @@ if __name__ == "__main__":
     ui.pushButtonConnectCam.setEnabled(False)
     hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))
     hikCamera1.cam_finded_camera_sig.connect(lambda:cam_status_block_serch_came(ui))
+    hikCamera1.cam_not_finded_sig.connect(lambda:cam_status_not_find_came(ui))
     ui.Cam_find_label.setText('No Camera Find')
     logger.info("App started")
 
