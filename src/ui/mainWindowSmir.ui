@@ -62,6 +62,27 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
+        <widget class="QLabel" name="Cam_find_label">
+         <property name="text">
+          <string>No find cam</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="searchCam">
+         <property name="text">
+          <string>Search Cam</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QProgressBar" name="cameraStatusProgressBar">
          <property name="value">
           <number>100</number>
@@ -99,6 +120,13 @@
        </item>
        <item>
         <layout class="QVBoxLayout" name="CnnLayout">
+         <item>
+          <widget class="Line" name="line_2">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QLabel" name="cnn_control_label">
            <property name="text">
