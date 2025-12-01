@@ -6,6 +6,8 @@ from modules_py.mainWindowSmir_ui import Ui_MainWindow
 from modules_py.hik_cam import  HikCam
 from modules_py.cnn_yolo import  CnnYolo
 
+from modules_py.settings import Setting
+
 import logging
 
 
@@ -76,6 +78,10 @@ if __name__ == "__main__":
     window.setWindowTitle("Hikrobot Camera Viewer")
     window.minimumSize()
     window.show()
+
+    setting1 = Setting()
+    setting1.set_setting_path('resources/settings.json')
+    setting1.read_settings()
     #Экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(30)
@@ -103,5 +109,7 @@ if __name__ == "__main__":
     hikCamera1.cam_not_finded_sig.connect(lambda:cam_status_not_find_came(ui))
     ui.Cam_find_label.setText('No Camera Find')
     logger.info("App started")
+
+
 
     sys.exit(app.exec())
