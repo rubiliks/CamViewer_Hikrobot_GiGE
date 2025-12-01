@@ -82,6 +82,7 @@ if __name__ == "__main__":
     setting1 = Setting()
     setting1.set_setting_path('resources/settings.json')
     setting1.read_settings()
+    setting1.write_setting()
     #Экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(30)

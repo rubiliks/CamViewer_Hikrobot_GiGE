@@ -1,6 +1,1 @@
-{
-      "cameraSetting": {
-        "gain": 4.0,
-        "exposureTime": 6000
-    }
-}
+{"cameraSetting": {"gain": 20.0, "exposureTime": 20000}}

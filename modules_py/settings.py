@@ -2,21 +2,14 @@ import json
 import logging
 from pathlib import PurePath, PureWindowsPath, PurePosixPath, Path
 
-
-#with open('../resources/settings.json', 'r', encoding='utf-8') as file:
-#    users = json.load(file)
-
-#for user in users:
-#    print(f"ID: {user['id']}, Имя: {user['name']}, Email: {user['email']}")
-
 logger = logging.getLogger(__name__)
-
 
 class Setting():
     def __init__(self):
         self.jsonSettingPath =''
         self.cameraSettingGain = 0.0
         self.cameraSettingExposureTime = 0
+        self.confige = ''
 
     def set_setting_path(self,SettingPath):
         p = Path(SettingPath)
@@ -29,11 +22,15 @@ class Setting():
     def read_settings(self):
         print(self.jsonSettingPath)
         with open(self.jsonSettingPath, 'r', encoding='utf-8') as file:
-            config = json.load(file)
+            self.confige = config = json.load(file)
             self.cameraSettingGain = config['cameraSetting']['gain']
             self.cameraSettingExposureTime = config['cameraSetting']['exposureTime']
 
-
+    def write_setting(self):
+        self.confige['cameraSetting']['gain'] =20.0
+        self.confige['cameraSetting']['exposureTime'] = 20000
+        with open(self.jsonSettingPath, "w") as file:
+            json.dump(self.confige, file)
 
 
 
