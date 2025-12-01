@@ -92,10 +92,10 @@ if __name__ == "__main__":
     ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
     # Cоеднение ui настроек камеры
     ui.gain_doubleSpinBox.setRange(0.0,20.0)
-    ui.gain_doubleSpinBox.setValue(2.0)
+    ui.gain_doubleSpinBox.setValue(setting1.cameraSettingGain)
     ui.gain_doubleSpinBox.valueChanged.connect(hikCamera1.get_gain)
     ui.exposureTime_spinBox.setRange(0,20000)
-    ui.exposureTime_spinBox.setValue(5000)
+    ui.exposureTime_spinBox.setValue(setting1.cameraSettingExposureTime)
     ui.exposureTime_spinBox.valueChanged.connect(hikCamera1.get_exposure)
     ui.pushButtonDisconectCam.setEnabled(False)
     ui.cameraStatusProgressBar.setValue(0)

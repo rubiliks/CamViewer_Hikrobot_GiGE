@@ -1,4 +1,6 @@
-[
-  {"id": 1, "name": "Анна", "email": "anna@example.com"},
-  {"id": 2, "name": "Петр", "email": "peter@example.com"}
-]
+{
+      "cameraSetting": {
+        "gain": 4.0,
+        "exposureTime": 6000
+    }
+}

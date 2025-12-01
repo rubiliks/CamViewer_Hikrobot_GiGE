@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 class Setting():
     def __init__(self):
         self.jsonSettingPath =''
+        self.cameraSettingGain = 0.0
+        self.cameraSettingExposureTime = 0
 
     def set_setting_path(self,SettingPath):
         p = Path(SettingPath)
@@ -27,9 +29,13 @@ class Setting():
     def read_settings(self):
         print(self.jsonSettingPath)
         with open(self.jsonSettingPath, 'r', encoding='utf-8') as file:
-            users = json.load(file)
-            for user in users:
-                print(f"ID: {user['id']}, Имя: {user['name']}, Email: {user['email']}")
+            config = json.load(file)
+            self.cameraSettingGain = config['cameraSetting']['gain']
+            self.cameraSettingExposureTime = config['cameraSetting']['exposureTime']
+
+
+
+
 
 
 
