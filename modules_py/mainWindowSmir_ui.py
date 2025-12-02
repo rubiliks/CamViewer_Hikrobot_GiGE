@@ -16,15 +16,15 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QDoubleSpinBox, QFrame, QGridLayout,
-    QGroupBox, QLabel, QMainWindow, QProgressBar,
-    QPushButton, QSizePolicy, QSpacerItem, QSpinBox,
-    QVBoxLayout, QWidget)
+    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
+    QMainWindow, QProgressBar, QPushButton, QSizePolicy,
+    QSpacerItem, QSpinBox, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(962, 576)
+        MainWindow.resize(962, 586)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_2 = QGridLayout(self.centralwidget)
@@ -88,19 +88,27 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.pushButtonDisconectCam)
 
-        self.CnnLayout = QVBoxLayout()
-        self.CnnLayout.setObjectName(u"CnnLayout")
         self.line_2 = QFrame(self.groupBoxButton)
         self.line_2.setObjectName(u"line_2")
         self.line_2.setFrameShape(QFrame.Shape.HLine)
         self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
 
-        self.CnnLayout.addWidget(self.line_2)
+        self.verticalLayout_2.addWidget(self.line_2)
 
+        self.CnnLayout = QVBoxLayout()
+        self.CnnLayout.setObjectName(u"CnnLayout")
         self.cnn_control_label = QLabel(self.groupBoxButton)
         self.cnn_control_label.setObjectName(u"cnn_control_label")
 
         self.CnnLayout.addWidget(self.cnn_control_label)
+
+        self.cnnStatusProgressBar = QProgressBar(self.groupBoxButton)
+        self.cnnStatusProgressBar.setObjectName(u"cnnStatusProgressBar")
+        self.cnnStatusProgressBar.setEnabled(True)
+        self.cnnStatusProgressBar.setValue(24)
+        self.cnnStatusProgressBar.setTextVisible(False)
+
+        self.CnnLayout.addWidget(self.cnnStatusProgressBar)
 
         self.pushButtonStartObjDetectCnn = QPushButton(self.groupBoxButton)
         self.pushButtonStartObjDetectCnn.setObjectName(u"pushButtonStartObjDetectCnn")
@@ -152,6 +160,30 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addWidget(self.groupBoxButton, 0, 1, 1, 1)
 
+        self.verticalLayout_4 = QVBoxLayout()
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer)
+
+        self.Cnn_path_lable = QLabel(self.centralwidget)
+        self.Cnn_path_lable.setObjectName(u"Cnn_path_lable")
+
+        self.horizontalLayout_2.addWidget(self.Cnn_path_lable)
+
+        self.Cnn_path_qlineEdit = QLineEdit(self.centralwidget)
+        self.Cnn_path_qlineEdit.setObjectName(u"Cnn_path_qlineEdit")
+
+        self.horizontalLayout_2.addWidget(self.Cnn_path_qlineEdit)
+
+
+        self.verticalLayout_4.addLayout(self.horizontalLayout_2)
+
+
+        self.gridLayout_2.addLayout(self.verticalLayout_4, 1, 0, 1, 2)
+
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -169,10 +201,13 @@ class Ui_MainWindow(object):
         self.pushButtonConnectCam.setText(QCoreApplication.translate("MainWindow", u"Connect Cam", None))
         self.pushButtonDisconectCam.setText(QCoreApplication.translate("MainWindow", u"Disconect Cam", None))
         self.cnn_control_label.setText(QCoreApplication.translate("MainWindow", u"CNN control", None))
+        self.cnnStatusProgressBar.setFormat(QCoreApplication.translate("MainWindow", u"%p%", None))
         self.pushButtonStartObjDetectCnn.setText(QCoreApplication.translate("MainWindow", u"Start Obj Detection", None))
         self.pushButtonStopObjDetectCnn.setText(QCoreApplication.translate("MainWindow", u"Stop Obj Detection", None))
         self.camera_setting_label.setText(QCoreApplication.translate("MainWindow", u"Camera setting", None))
         self.gain_lable.setText(QCoreApplication.translate("MainWindow", u"Gain", None))
         self.exposureTime_lable.setText(QCoreApplication.translate("MainWindow", u"ExposureTime", None))
+        self.Cnn_path_lable.setText(QCoreApplication.translate("MainWindow", u"CNN Path", None))
+        self.Cnn_path_qlineEdit.setText(QCoreApplication.translate("MainWindow", u"./resources/EMG_2025_24_06_v1.engine", None))
     # retranslateUi
 
