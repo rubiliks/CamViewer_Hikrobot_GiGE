@@ -10,6 +10,7 @@ class Setting():
         self.cameraSettingGain = 0.0
         self.cameraSettingExposureTime = 0
         self.confige = ''
+        self.cnnPath = ''
 
     def set_setting_path(self,SettingPath):
         p = Path(SettingPath)
@@ -24,6 +25,7 @@ class Setting():
             self.confige = config = json.load(file)
             self.cameraSettingGain = config['cameraSetting']['gain']
             self.cameraSettingExposureTime = config['cameraSetting']['exposureTime']
+            self.cnnPath = config['CnnSetting']['cnnPath']
 
     def write_setting_gain(self, gain_link):
         self.confige['cameraSetting']['gain'] = gain_link

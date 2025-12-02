@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>962</width>
-    <height>586</height>
+    <height>608</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -242,6 +242,13 @@
          <widget class="QLineEdit" name="Cnn_path_qlineEdit">
           <property name="text">
            <string>./resources/EMG_2025_24_06_v1.engine</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Set CNN</string>
           </property>
          </widget>
         </item>

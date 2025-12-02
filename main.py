@@ -1,13 +1,10 @@
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QTimer
-
 from MvImport.MvCameraControl_class import *
 from modules_py.mainWindowSmir_ui import Ui_MainWindow
 from modules_py.hik_cam import  HikCam
 from modules_py.cnn_yolo import  CnnYolo
-
 from modules_py.settings import Setting
-
 import logging
 
 
@@ -49,8 +46,18 @@ def cam_status_block_button_ui(ui_link):
     else:
         ui_link.searchCam.setEnabled(True)
 
-#def cnn_status_button_ui(ui_link):
-
+def cnn_status_button_ui(ui_link):
+    if ui_link.pushButtonStopObjDetectCnn.isEnabled():
+        ui_link.pushButtonStartObjDetectCnn.setEnabled(True)
+        ui_link.pushButtonStopObjDetectCnn.setEnabled(False)
+        ui_link.label.clear()
+        ui_link.cnnStatusProgressBar.setValue(0)
+        ui_link.Cnn_path_qlineEdit.setEnabled(True)
+    else:
+        ui_link.pushButtonStartObjDetectCnn.setEnabled(False)
+        ui_link.pushButtonStopObjDetectCnn.setEnabled(True)
+        ui_link.cnnStatusProgressBar.setValue(100)
+        ui_link.Cnn_path_qlineEdit.setEnabled(False)
 
 def cam_status_block_serch_came(ui_link):
     if not ui_link.pushButtonConnectCam.isEnabled():
@@ -67,17 +74,22 @@ def change_gain_setting(ui_link,setting_link):
 def change_exposure_setting(ui_link,setting_link):
     setting_link.write_setting_exposure(ui_link.exposureTime_spinBox.value())
 
+
 if __name__ == "__main__":
     logger.info("Start app")
     #Qt создание приложение
     app = QApplication(sys.argv)
+    # Экземпляр сеттинга
+    setting1 = Setting()
+    setting1.set_setting_path('resources/settings.json')
+    setting1.read_settings()
     #Экземпляр класса камеры
     hikCamera1 = HikCam()
-    #hikCamera1.update_cam_list()
     #Экземпляр класса нейроной сети
     cnn1 = CnnYolo()
     cnn1.check_envir()
-    cnn1.create_model('./resources/EMG_2025_24_06_v1.engine')
+    cnn1.create_model(setting1.cnnPath)
+
     #Экземпляр ui
     window = QMainWindow()
     ui = Ui_MainWindow()
@@ -85,10 +97,6 @@ if __name__ == "__main__":
     window.setWindowTitle("Hikrobot Camera Viewer")
     window.minimumSize()
     window.show()
-    # Экземпляр сеттинга
-    setting1 = Setting()
-    setting1.set_setting_path('resources/settings.json')
-    setting1.read_settings()
     #Экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(30)
@@ -109,12 +117,15 @@ if __name__ == "__main__":
     ui.pushButtonDisconectCam.setEnabled(False)
     ui.cameraStatusProgressBar.setValue(0)
     ui.cnnStatusProgressBar.setValue(0)
+    ui.pushButtonStopObjDetectCnn.setEnabled(False)
+    ui.lineEdit.setEnabled(False)
+
     # Соединение кнопок нейросети
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:timer.start())
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
+    ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:cnn_status_button_ui(ui))
+    ui.pushButtonStopObjDetectCnn.clicked.connect(lambda: cnn_status_button_ui(ui))
 
-
-    #ui.pushButtonStartObjDetectCnn.clicked
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)
     hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))

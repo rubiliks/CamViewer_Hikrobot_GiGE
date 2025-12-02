@@ -5,5 +5,8 @@
   },
   "CnnSetting": {
     "cnnPath": "./resources/EMG_2025_24_06_v1.engine"
+  },
+  "AppSetting": {
+    "appPathSetting":"resources/settings.json"
   }
 }
