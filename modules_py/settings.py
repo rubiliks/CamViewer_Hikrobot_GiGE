@@ -26,9 +26,9 @@ class Setting():
             self.cameraSettingGain = config['cameraSetting']['gain']
             self.cameraSettingExposureTime = config['cameraSetting']['exposureTime']
 
-    def write_setting(self):
-        self.confige['cameraSetting']['gain'] =20.0
-        self.confige['cameraSetting']['exposureTime'] = 20000
+    def write_setting(self,gain_link,exposure_link):
+        self.confige['cameraSetting']['gain'] = gain_link
+        self.confige['cameraSetting']['exposureTime'] = exposure_link
         with open(self.jsonSettingPath, "w") as file:
             json.dump(self.confige, file)
 

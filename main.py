@@ -59,6 +59,10 @@ def cam_status_not_find_came(ui_link):
     ui_link.pushButtonConnectCam.setEnabled(False)
     ui_link.Cam_find_label.setText("Cam not find")
 
+def change_gain(ui_link,setting_link):
+    setting_link.write_setting(ui_link.gain_doubleSpinBox.value(),ui_link.exposureTime_spinBox.value())
+
+
 
 if __name__ == "__main__":
     logger.info("Start app")
@@ -82,7 +86,6 @@ if __name__ == "__main__":
     setting1 = Setting()
     setting1.set_setting_path('resources/settings.json')
     setting1.read_settings()
-    setting1.write_setting()
     #Экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(30)
@@ -98,6 +101,8 @@ if __name__ == "__main__":
     ui.exposureTime_spinBox.setRange(0,20000)
     ui.exposureTime_spinBox.setValue(setting1.cameraSettingExposureTime)
     ui.exposureTime_spinBox.valueChanged.connect(hikCamera1.get_exposure)
+    ui.gain_doubleSpinBox.valueChanged.connect(lambda:change_gain(ui,setting1))
+
     ui.pushButtonDisconectCam.setEnabled(False)
     ui.cameraStatusProgressBar.setValue(0)
     # Соединение кнопок нейросети
@@ -110,7 +115,5 @@ if __name__ == "__main__":
     hikCamera1.cam_not_finded_sig.connect(lambda:cam_status_not_find_came(ui))
     ui.Cam_find_label.setText('No Camera Find')
     logger.info("App started")
-
-
 
     sys.exit(app.exec())
