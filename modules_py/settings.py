@@ -20,18 +20,20 @@ class Setting():
             logger.error("path not exist")
 
     def read_settings(self):
-        print(self.jsonSettingPath)
         with open(self.jsonSettingPath, 'r', encoding='utf-8') as file:
             self.confige = config = json.load(file)
             self.cameraSettingGain = config['cameraSetting']['gain']
             self.cameraSettingExposureTime = config['cameraSetting']['exposureTime']
 
-    def write_setting(self,gain_link,exposure_link):
+    def write_setting_gain(self, gain_link):
         self.confige['cameraSetting']['gain'] = gain_link
-        self.confige['cameraSetting']['exposureTime'] = exposure_link
         with open(self.jsonSettingPath, "w") as file:
             json.dump(self.confige, file)
 
+    def write_setting_exposure(self, exposure_link):
+        self.confige['cameraSetting']['exposureTime'] = exposure_link
+        with open(self.jsonSettingPath, "w") as file:
+            json.dump(self.confige, file)
 
 
 

@@ -1,1 +1,9 @@
-{"cameraSetting": {"gain": 9.99, "exposureTime": 9999}}
+{
+  "cameraSetting": {
+    "gain": 10.0,
+    "exposureTime": 7777
+  },
+  "CnnSetting": {
+    "cnnPath": "./resources/EMG_2025_24_06_v1.engine"
+  }
+}

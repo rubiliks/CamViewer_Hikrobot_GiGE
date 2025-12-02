@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainWindowSmir.ui'
+## Form generated from reading UI file 'mainWindowSmir_ui.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.10.0
 ##
@@ -164,9 +164,16 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.label_2 = QLabel(self.centralwidget)
+        self.label_2.setObjectName(u"label_2")
 
-        self.horizontalLayout_2.addItem(self.horizontalSpacer)
+        self.horizontalLayout_2.addWidget(self.label_2)
+
+        self.lineEdit = QLineEdit(self.centralwidget)
+        self.lineEdit.setObjectName(u"lineEdit")
+        self.lineEdit.setEnabled(True)
+
+        self.horizontalLayout_2.addWidget(self.lineEdit)
 
         self.Cnn_path_lable = QLabel(self.centralwidget)
         self.Cnn_path_lable.setObjectName(u"Cnn_path_lable")
@@ -207,7 +214,8 @@ class Ui_MainWindow(object):
         self.camera_setting_label.setText(QCoreApplication.translate("MainWindow", u"Camera setting", None))
         self.gain_lable.setText(QCoreApplication.translate("MainWindow", u"Gain", None))
         self.exposureTime_lable.setText(QCoreApplication.translate("MainWindow", u"ExposureTime", None))
-        self.Cnn_path_lable.setText(QCoreApplication.translate("MainWindow", u"CNN Path", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Setting path:", None))
+        self.Cnn_path_lable.setText(QCoreApplication.translate("MainWindow", u"CNN Path:", None))
         self.Cnn_path_qlineEdit.setText(QCoreApplication.translate("MainWindow", u"./resources/EMG_2025_24_06_v1.engine", None))
     # retranslateUi
 
