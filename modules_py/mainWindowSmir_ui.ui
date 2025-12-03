@@ -246,9 +246,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="ApplyCNNpushButton">
           <property name="text">
-           <string>Set CNN</string>
+           <string>Apply CNN</string>
           </property>
          </widget>
         </item>

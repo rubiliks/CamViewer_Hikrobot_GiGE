@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(962, 586)
+        MainWindow.resize(962, 608)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_2 = QGridLayout(self.centralwidget)
@@ -185,6 +185,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.Cnn_path_qlineEdit)
 
+        self.ApplyCNNpushButton = QPushButton(self.centralwidget)
+        self.ApplyCNNpushButton.setObjectName(u"ApplyCNNpushButton")
+
+        self.horizontalLayout_2.addWidget(self.ApplyCNNpushButton)
+
 
         self.verticalLayout_4.addLayout(self.horizontalLayout_2)
 
@@ -217,5 +222,6 @@ class Ui_MainWindow(object):
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Setting path:", None))
         self.Cnn_path_lable.setText(QCoreApplication.translate("MainWindow", u"CNN Path:", None))
         self.Cnn_path_qlineEdit.setText(QCoreApplication.translate("MainWindow", u"./resources/EMG_2025_24_06_v1.engine", None))
+        self.ApplyCNNpushButton.setText(QCoreApplication.translate("MainWindow", u"Apply CNN", None))
     # retranslateUi
 

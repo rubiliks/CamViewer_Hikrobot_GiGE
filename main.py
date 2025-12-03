@@ -59,6 +59,10 @@ def cnn_status_button_ui(ui_link):
         ui_link.cnnStatusProgressBar.setValue(100)
         ui_link.Cnn_path_qlineEdit.setEnabled(False)
 
+def cnn_apply_cnn_path (cnn_link,cnn_path):
+    cnn_link.create_model(cnn_path)
+
+
 def cam_status_block_serch_came(ui_link):
     if not ui_link.pushButtonConnectCam.isEnabled():
         ui_link.pushButtonConnectCam.setEnabled(True)
@@ -125,6 +129,7 @@ if __name__ == "__main__":
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:cnn_status_button_ui(ui))
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda: cnn_status_button_ui(ui))
+    ui.ApplyCNNpushButton.clicked.connect(lambda:cnn_apply_cnn_path(cnn1,setting1.cnnPath))
 
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)
