@@ -7,3 +7,6 @@ Linux 6.14.0-36-generic
 NVIDIA GeForce RTX 3060
 pycharm-2025.1.6
 Anaconda3-2025.06-0-Linux-x86_64
+
+MVS_Linux_STD_V4.6.1_251113
+
