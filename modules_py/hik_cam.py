@@ -161,7 +161,7 @@ class HikCam(QObject):
                 del stConvertParam.pSrcData
                 sys.exit()
             img_buff = (c_ubyte * stConvertParam.nDstLen)()
-            cdll.msvcrt.memcpy(byref(img_buff), stConvertParam.pDstBuffer, stConvertParam.nDstLen)  # копирование данных
+            ctypes.memmove(ctypes.byref(img_buff), stConvertParam.pDstBuffer, stConvertParam.nDstLen) # копирование данных
             img_buff = np.frombuffer(img_buff, count=int(stConvertParam.nDstBufferSize),  # преобразование в np массив
                                      dtype=np.uint8)  # data以流的形式读入转化成ndarray对象
             img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)

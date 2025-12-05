@@ -53,11 +53,13 @@ def cnn_status_button_ui(ui_link):
         ui_link.label.clear()
         ui_link.cnnStatusProgressBar.setValue(0)
         ui_link.Cnn_path_qlineEdit.setEnabled(True)
+        ui_link.ApplyCNNpushButton.setEnabled(True)
     else:
         ui_link.pushButtonStartObjDetectCnn.setEnabled(False)
         ui_link.pushButtonStopObjDetectCnn.setEnabled(True)
         ui_link.cnnStatusProgressBar.setValue(100)
         ui_link.Cnn_path_qlineEdit.setEnabled(False)
+        ui_link.ApplyCNNpushButton.setEnabled(False)
 
 def cnn_apply_cnn_path (cnn_link,cnn_path):
     cnn_link.create_model(cnn_path)
@@ -138,5 +140,6 @@ if __name__ == "__main__":
     hikCamera1.cam_not_finded_sig.connect(lambda:cam_status_not_find_came(ui))
     ui.Cam_find_label.setText('No Camera Find')
     logger.info("App started")
+
 
     sys.exit(app.exec())

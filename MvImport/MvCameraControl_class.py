@@ -54,7 +54,8 @@ def check_sys_and_update_dll():
             if bit_info == "32":
                 MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/32/libMvCameraControl.so"
             else: 
-                MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/64/libMvCameraControl.so"
+                #MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/64/libMvCameraControl.so"
+                MvCamCtrldllPath = "/opt/MVS/lib/64/libMvCameraControl.so"
         elif architecture == 'arm-none':
             MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/arm-none/libMvCameraControl.so"
         elif architecture == 'armhf':

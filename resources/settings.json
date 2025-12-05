@@ -1,12 +1,1 @@
-{
-  "cameraSetting": {
-    "gain": 10.0,
-    "exposureTime": 7777
-  },
-  "CnnSetting": {
-    "cnnPath": "./resources/yolov8s.engine"
-  },
-  "AppSetting": {
-    "appPathSetting":"resources/settings.json"
-  }
-}
+{"cameraSetting": {"gain": 0.0, "exposureTime": 1000}, "CnnSetting": {"cnnPath": "./resources/yolov8s.engine"}, "AppSetting": {"appPathSetting": "resources/settings.json"}}
