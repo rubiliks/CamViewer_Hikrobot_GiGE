@@ -1,3 +1,7 @@
+
+<img width="969" height="650" alt="image" src="https://github.com/user-attachments/assets/0d9c8e43-b58d-479c-ac55-ab45d4a6d5c1" />
+
+
 Program to connect to hikcam camera and send image to Yolo CNN
 Tested whis Gige cam MV-CS016-10GC,MV-CS-04-11GC on Windows 10
 
