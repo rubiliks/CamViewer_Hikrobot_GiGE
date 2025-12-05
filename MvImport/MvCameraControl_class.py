@@ -13,6 +13,18 @@ from CameraParams_const import *
 from CameraParams_header import *
 from MvErrorDefine_const import *
 
+
+# 根据平台设置调用约定
+def get_platform_functype():
+    if platform.system() == 'Windows':
+        # 32位Windows使用WINFUNCTYPE，64位使用CFUNCTYPE
+        if sys.maxsize <= 2**32:
+            return WINFUNCTYPE
+        else:
+            return CFUNCTYPE
+    else:
+        return CFUNCTYPE
+
     
 def check_sys_and_update_dll():
     
@@ -37,22 +49,28 @@ def check_sys_and_update_dll():
     else:
         architecture = platform.machine()
         if architecture == 'aarch64':
-            #print(" current is aarch64 system .")
             MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/aarch64/libMvCameraControl.so"
         elif architecture == 'x86_64':
             if bit_info == "32":
                 MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/32/libMvCameraControl.so"
             else: 
                 MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/64/libMvCameraControl.so"
-        elif architecture == 'armhf':
-            MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/armhf/libMvCameraControl.so"
         elif architecture == 'arm-none':
             MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/arm-none/libMvCameraControl.so"
+        elif architecture == 'armhf':
+            MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/armhf/libMvCameraControl.so"
+        elif architecture == 'armv6l':
+            MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/armhf/libMvCameraControl.so"
+        elif architecture == 'armv7l':
+            MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/armhf/libMvCameraControl.so"
+        elif architecture == 'i386':
+            MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/32/libMvCameraControl.so"
+        elif architecture == 'i686':
+            MvCamCtrldllPath = os.getenv('MVCAM_COMMON_RUNENV') + "/32/libMvCameraControl.so"
         else:
             print ("machine: %s, not support." % architecture) 
         
-#    print ("MvCamCtrldll path is: %s" % MvCamCtrldllPath) 
-    MvCamCtrldll = ctypes.cdll.LoadLibrary(MvCamCtrldllPath)
+        MvCamCtrldll = ctypes.cdll.LoadLibrary(MvCamCtrldllPath)
         
         
 #检测系统，并加载sdk库
@@ -383,6 +401,7 @@ class MvCamera():
     #  @brief  注册图像数据回调，回调函数结束后，需要调用MV_CC_FreeImageBuffer才能回收图像缓存
     #  @param  handle                      [IN]            设备句柄
     #  @param  cbOutput                    [IN]            回调函数指针
+    #  @param  bAutoFree                   [IN]            图像缓存自动回收标记(true：回调结束后，图像缓存会被SDK回收；false：回调结束后，需要调用MV_CC_FreeImageBuffer接口才能回收图像缓存)
     #  @param  pUser                       [IN]            用户自定义变量
     #  @return 成功，返回MV_OK；错误，返回错误码
     #  @remarks 通过该接口可以设置图像数据回调函数，在MV_CC_CreateHandle之后即可调用。
@@ -394,6 +413,7 @@ class MvCamera():
     #  @brief  Register the image callback function, Call MV_CC_FreeImageBuffer() to release the buffer after the callback function ends.
     #  @param  handle                      [IN]            Device handle
     #  @param  cbOutput                    [IN]            Callback function pointer
+    #  @param  bAutoFree                   [IN]            It refers to the mark for automatic releasing of image buffer. (true:The image buffer will be released and reused by SDK after callback. false:After callback, it is required to call MV_CC_FreeImageBuffer() to release and reuse the image buffer.)
     #  @param  pUser                       [IN]            User defined variable
     #  @return Success, return MV_OK. Failure, return error code
     #  @remarks After MV_CC_CreateHandle, call this interface to set image data callback function.
@@ -1784,14 +1804,14 @@ class MvCamera():
     #  @~chinese
     #  @brief  设置GVSP取流超时时间
     #  @param  handle                      [IN]            设备句柄
-    #  @param  nMillisec                   [IN]            超时时间，默认300ms，范围:[10 - UINT_MAX)
+    #  @param  nMillisec                   [IN]            超时时间，默认300ms，范围：>10ms
     #  @return 成功，返回MV_OK；错误，返回错误码 
     #  @remarks 连接设备之后，取流动作发生前，调用该接口可以设置GVSP取流超时时间。GVSP取流超时设置过短可能造成图像异常，设置过长可能造成取流时间变长。
 
     #  @~english
     #  @brief  Set GVSP streaming timeout
     #  @param  handle                      [IN]            Device handle
-    #  @param  nMillisec                   [IN]            Timeout, default 300ms, range:[10 - UINT_MAX)
+    #  @param  nMillisec                   [IN]            It refers to timeout duration (unit:millisecond), range:>10ms. The default value is 300 ms.
     #  @return Success, return MV_OK. Failure, return error code
     #  @remarks After the device is connected, and just before start streaming, 
     #           call this interface to set GVSP streaming timeout value.
@@ -2980,7 +3000,7 @@ class MvCamera():
 
     ##
     #  @~chinese
-    #  @brief  向串口写数据，一次最大写1024字节的数据
+    #  @brief  向串口写数据，一次最大写512字节的数据
     #  @param  handle                      [IN]            设备句柄
     #  @param  pBuffer                     [IN]            数据
     #  @param  nLength                     [IN]            数据长度
@@ -2989,7 +3009,7 @@ class MvCamera():
     #  @remarks 接口为阻塞模式，数据全部发送完成或者发送失败时返回
 
     #  @~english
-    #  @brief  Writes data to serial port, maximum 1024 bytes
+    #  @brief  Writes data to serial port, maximum 512 bytes
     #  @param  handle                      [IN]            Device handle
     #  @param  pBuffer                     [IN]            data
     #  @param  nLength                     [IN]            data length

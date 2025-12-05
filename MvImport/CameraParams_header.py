@@ -110,7 +110,30 @@ MV_TRIGGER_SOURCE_SOFTWARE = 7                   ## @~chinese 软触发         
 MV_TRIGGER_SOURCE_FrequencyConverter = 8         ## @~chinese 触发源变频器                             @~english Trigger source frequency converter
 
 
-## @~chinese   U3V流异常类型
+## @~chinese   图像扩展信息的类型 MV_FRAME_EXTRA_INFO_TYPE     @~english  Image Extended Information Type: MV_FRAME_EXTRA_INFO_TYPE
+MV_FRAME_EXTRA_NO_INFO     = 0x0000              ## @~chinese 没有扩展信息
+MV_FRAME_EXTRA_SUBIMAGES   = 0x0001              ## @~chinese 子图
+MV_FRAME_EXTRA_MULTIPARTS  = 0x0002              ## @~chinese 多部分
+
+## @~chinese  ZONE方向（自上而下或者自下而上） MV_GIGE_ZONE_DIRECTION     @~english Zone Direction (Top to Bottom or Bottom to Top) - MV_GIGE_ZONE_DIRECTION (system variable)
+MV_GIGE_PART_ZONE_TOP_DOWN = 0 
+MV_GIGE_PART_ZONE_BOTTOM_UP  = 1
+
+## @~chinese   数据类型 MV_MULTI_PART_DATA_TYPE     @~english Data Type:  MV_MULTI_PART_DATA_TYPE
+MV_GIGE_DT_2D_IMAGE_1_PLANAR = 0x0001 
+MV_GIGE_DT_2D_IMAGE_2_PLANAR = 0x0002 
+MV_GIGE_DT_2D_IMAGE_3_PLANAR = 0x0003
+MV_GIGE_DT_2D_IMAGE_4_PLANAR = 0x0004
+MV_GIGE_DT_3D_IMAGE_1_PLANAR = 0x0005
+MV_GIGE_DT_3D_IMAGE_2_PLANAR = 0x0006
+MV_GIGE_DT_3D_IMAGE_3_PLANAR = 0x0007
+MV_GIGE_DT_3D_IMAGE_4_PLANAR = 0x0008
+MV_GIGE_DT_CONFIDENCE_MAP = 0x0009
+MV_GIGE_DT_CHUNK_DATA = 0x000A
+MV_GIGE_DT_JPEG_IMAGE = 0x000B
+MV_GIGE_DT_JPEG2000_IMAGE = 0x000C
+
+## @~chinese   流异常类型      @~english  Stream Anomaly Type
 MV_CC_STREAM_EXCEPTION_ABNORMAL_IMAGE = 0x4001   ## @~chinese 图像异常(图像长度不正确、数据包内容解析异常和校验失败等),丢弃该帧(可能原因：链路传输异常和设备发包异常等)             @~english Image anomaly (incorrect image length, data packet content parsing error, checksum failure, etc.): discard the frame. Possible causes: link transmission anomalies, device packet transmission anomalies, etc.
 MV_CC_STREAM_EXCEPTION_LIST_OVERFLOW = 0x4002    ## @~chinese 缓存列表已满(没有及时取走图像),采集卡下相机和单USB口相机不支持       @~english The cache list is full (due to images not being retrieved in time). Cameras under the capture card and single USB port cameras are not supported.
 MV_CC_STREAM_EXCEPTION_LIST_EMPTY = 0x4003       ## @~chinese 缓存列表为空(取走图像后未及时将图像缓存归还)        @~english    The cache list is empty (the image was taken from the cache but not returned in time).
@@ -118,6 +141,7 @@ MV_CC_STREAM_EXCEPTION_RECONNECTION = 0x4004     ## @~chinese 触发一次断流
 MV_CC_STREAM_EXCEPTION_DISCONNECTED = 0x4005     ## @~chinese 断流恢复失败,取流被中止(仅U3V支持)                  @~english  Failed to recover from stream interruption: Stream retrieval terminated (Supported only by U3V).
 MV_CC_STREAM_EXCEPTION_DEVICE = 0x4006           ## @~chinese 设备异常,取流被中止(仅U3V支持)                      @~english  Streaming interrupted due to device error (only supported by U3V)
 MV_CC_STREAM_EXCEPTION_PARTIAL_IMAGE = 0x4007    ## @~chinese 行高不足,丢弃残帧(线阵相机或者采集卡配置了残帧丢弃模式,出图行高不足时被SDK丢弃)  @~english   Insufficient line height (discard residual frames): Incomplete frames are discarded by the SDK when the line height is insufficient if line-scan cameras or frame grabbers are configured with residual frame discard mode.
+MV_CC_STREAM_EXCEPTION_IMAGE_BUFFER_OVERFLOW   = 0x4008    ## @~chinese 设备发送的图像数据大小超过了图像缓冲区容量(该帧丢弃)   @~english  The size of the image data sent by the device exceeds the image buffer capacity (this frame is dropped).
 
 
 ## @~chinese  Gige的传输类型            @~english The transmission type of Gige
@@ -477,6 +501,79 @@ MV_CC_IMAGE = _MV_CC_IMAGE_
 
 
 
+
+# values for enumeration '_MV_FRAME_EXTRA_INFO_TYPE_'
+_MV_FRAME_EXTRA_INFO_TYPE_ = c_int # enum
+MV_FRAME_EXTRA_INFO_TYPE = _MV_FRAME_EXTRA_INFO_TYPE_
+
+# values for enumeration '_MV_GIGE_ZONE_DIRECTION_'
+_MV_GIGE_ZONE_DIRECTION_ = c_int # enum
+MV_GIGE_ZONE_DIRECTION = _MV_GIGE_ZONE_DIRECTION_
+class _MV_GIGE_ZONE_INFO_(Structure):
+    pass
+class N19_MV_GIGE_ZONE_INFO_3DOT_1E(Union):
+    pass
+N19_MV_GIGE_ZONE_INFO_3DOT_1E._fields_ = [
+    ('pZoneAddr', POINTER(c_ubyte)),
+    ('nAlign', uint64_t),
+]
+_MV_GIGE_ZONE_INFO_._fields_ = [
+    ('enDirection', MV_GIGE_ZONE_DIRECTION),
+    ('stZone', N19_MV_GIGE_ZONE_INFO_3DOT_1E),
+    ('nLength', uint64_t),
+    ('nReserved', c_uint * 6),
+]
+MV_GIGE_ZONE_INFO = _MV_GIGE_ZONE_INFO_
+class _MV_GIGE_MULRI_PART_DATA_INFO_(Union):
+    pass
+class N30_MV_GIGE_MULRI_PART_DATA_INFO_3DOT_2E(Structure):
+    pass
+N30_MV_GIGE_MULRI_PART_DATA_INFO_3DOT_2E._fields_ = [
+    ('nSizeX', c_uint),
+    ('nSizeY', c_uint),
+    ('nOffsetX', c_uint),
+    ('nOffsetY', c_uint),
+    ('nPaddingX', c_ushort),
+]
+
+class N30_MV_GIGE_MULRI_PART_DATA_INFO_3DOT_3E(Structure):
+    pass
+N30_MV_GIGE_MULRI_PART_DATA_INFO_3DOT_3E._fields_ = [
+    ('nJpegFlag', c_ubyte),
+    ('nTimestampTickFrequencyHigh', c_uint),
+    ('nTimestampTickFrequencyLow', c_uint),
+    ('nJpegDataFormat', c_uint),
+]
+_MV_GIGE_MULRI_PART_DATA_INFO_._fields_ = [
+    ('stGeneral', N30_MV_GIGE_MULRI_PART_DATA_INFO_3DOT_2E),
+    ('stJpeg', N30_MV_GIGE_MULRI_PART_DATA_INFO_3DOT_3E),
+    ('pDataTypeSpecific', c_ubyte * 24),
+]
+MV_GIGE_PART_DATA_INFO = _MV_GIGE_MULRI_PART_DATA_INFO_
+
+# values for enumeration '_MV_GIGE_MULTI_PART_DATA_TYPE_'
+_MV_GIGE_MULTI_PART_DATA_TYPE_ = c_int # enum
+MV_GIGE_MULTI_PART_DATA_TYPE = _MV_GIGE_MULTI_PART_DATA_TYPE_
+
+class _MV_GIGE_MULTI_PART_INFO_(Structure):
+    pass
+_MV_GIGE_MULTI_PART_INFO_._fields_ = [
+    ('enDataType', MV_GIGE_MULTI_PART_DATA_TYPE),
+    ('nDataFormat', c_uint),
+    ('nSourceID', c_uint),
+    ('nRegionID', c_uint),
+    ('nDataPurposeID', c_uint),
+    ('nZones', c_uint),
+    ('pZoneInfo', POINTER(MV_GIGE_ZONE_INFO)),
+    ('nLength', uint64_t),
+    ('pPartAddr', POINTER(c_ubyte)),
+    ('stDataTypeSpecific', MV_GIGE_PART_DATA_INFO),
+    ('nReserved', c_uint * 8),
+]
+MV_GIGE_MULTI_PART_INFO = _MV_GIGE_MULTI_PART_INFO_
+
+
+
 # 输出帧的信息    @~english Output Frame Information
 class _MV_FRAME_OUT_INFO_EX_(Structure):
     pass
@@ -493,6 +590,7 @@ class N22_MV_FRAME_OUT_INFO_EX_3DOT_2E(Union):
     pass
 N22_MV_FRAME_OUT_INFO_EX_3DOT_2E._fields_ = [
     ('pstSubImage', POINTER(MV_CC_IMAGE)),
+    ('pstPartInfo', POINTER(MV_GIGE_MULTI_PART_INFO)),
     ('nAligning', int64_t),
 ]
 
@@ -543,11 +641,13 @@ _MV_FRAME_OUT_INFO_EX_._fields_ = [
     ('nExtendWidth', c_uint),                                ## @~chinese 图像宽(扩展变量)       @~english Image Width
     ('nExtendHeight', c_uint),                               ## @~chinese 图像高(扩展变量)       @~english Image Height
     ('nFrameLenEx', uint64_t),                               ## @~chinese 帧的长度               @~english The Length of Frame   
-    ('nReserved1', c_uint),                                  # <\~chinese 保留，用于对齐         @~english Reserved
+    ('nExtraType', c_uint),                                  ## @~chinese判断携带的额外信息的类型：子图(SubImageList)还是多图(MultiPartArray) MV_FRAME_EXTRA_INFO_TYPE类型         @~english Reserved Identify the type of additional information: SubImageList or MultiPartArray of type MV_FRAME_EXTRA_INFO_TYPE.
     ('nSubImageNum', c_uint),                                ## @~chinese 图像缓存中的子图个数   @~english  Number of sub-images in the image cache
     ('SubImageList', N22_MV_FRAME_OUT_INFO_EX_3DOT_2E),      ## @~chinese 子图信息               @~english Sub image info
     ('UserPtr', N22_MV_FRAME_OUT_INFO_EX_3DOT_3E),           ## @~chinese 自定义指针(外部注册缓存时，内存地址对应的用户自定义指针)          @~english Custom pointer (user-defined pointer corresponding to memory address when registering external cache)
-    ('nReserved', c_uint * 26),                              ## @~chinese 保留字节            @~english Reserved bytes
+    ('nFirstLineEncoderCount', c_uint),                      ## @~chinese 首行编码器计数       @~english  First line encoder count
+    ('nLastLineEncoderCount', c_uint),                       ## @~chinese 尾行编码器计数       @~english  Last line encoder count
+    ('nReserved', c_uint * 24),                              ## @~chinese 保留字节            @~english Reserved bytes
 ]
 MV_FRAME_OUT_INFO_EX = _MV_FRAME_OUT_INFO_EX_
 
@@ -982,8 +1082,8 @@ MV_EVENT_OUT_INFO = _MV_EVENT_OUT_INFO_
 class _MV_CC_FILE_ACCESS_T(Structure):
     pass
 _MV_CC_FILE_ACCESS_T._fields_ = [
-    ('pUserFileName', STRING),  ## @~chinese 用户文件名          @~english User file name
-    ('pDevFileName', STRING),   ## @~chinese 设备文件名          @~english Device file name
+    ('pUserFileName', c_char_p),  ## @~chinese 用户文件名          @~english User file name
+    ('pDevFileName', c_char_p),   ## @~chinese 设备文件名          @~english Device file name
     ('nReserved', c_uint * 32), ## @~chinese 保留字节            @~english Reserved bytes
 ]
 MV_CC_FILE_ACCESS = _MV_CC_FILE_ACCESS_T
@@ -1006,7 +1106,7 @@ _MV_CC_FILE_ACCESS_E._fields_ = [
     ('pUserFileBuf', POINTER(c_char)),  ## @~chinese 用户文件数据        @~english User file data
     ('pFileBufSize', c_uint),  ## @~chinese 用户数据缓存大小       @~english data buffer size
     ('pFileBufLen', c_uint),   ## @~chinese 用户数据缓存长度       @~english data buffer len
-    ('pDevFileName', STRING),           ## @~chinese 设备文件名          @~english Device file name
+    ('pDevFileName', c_char_p),           ## @~chinese 设备文件名          @~english Device file name
     ('nReserved', c_uint * 32),         ## @~chinese 保留字节            @~english Reserved bytes
 ]
 MV_CC_FILE_ACCESS_EX = _MV_CC_FILE_ACCESS_E
@@ -1501,6 +1601,11 @@ __all__ = ['_MV_ALL_MATCH_INFO_', 'MV_CC_FILE_ACCESS_PROGRESS',
            'IFT_IString',
            'MV_ACQ_MODE_CONTINUOUS',
            'MV_TRIGGER_SOURCE_FrequencyConverter',
+           'MV_FRAME_EXTRA_NO_INFO','MV_FRAME_EXTRA_SUBIMAGES','MV_FRAME_EXTRA_MULTIPARTS',
+           'MV_GIGE_PART_ZONE_TOP_DOWN','MV_GIGE_PART_ZONE_BOTTOM_UP',
+           'MV_GIGE_DT_2D_IMAGE_1_PLANAR','MV_GIGE_DT_2D_IMAGE_2_PLANAR','MV_GIGE_DT_2D_IMAGE_3_PLANAR','MV_GIGE_DT_2D_IMAGE_4_PLANAR', 
+           'MV_GIGE_DT_3D_IMAGE_1_PLANAR','MV_GIGE_DT_3D_IMAGE_2_PLANAR','MV_GIGE_DT_3D_IMAGE_3_PLANAR','MV_GIGE_DT_3D_IMAGE_4_PLANAR', 
+           'MV_GIGE_DT_CONFIDENCE_MAP','MV_GIGE_DT_CHUNK_DATA','MV_GIGE_DT_JPEG_IMAGE','MV_GIGE_DT_JPEG2000_IMAGE',           
            'MV_TRIGGER_SOURCE_COUNTER0',
            'MV_GAIN_MODE_OFF', '_MV_CC_DEVICE_INFO_LIST_',
            'MV_GIGE_DEVICE_INFO', '_MV_SAVE_IMAGE_PARAM_T_EX_', '_MV_SAVE_IMAGE_PARAM_EX3_',
@@ -1560,6 +1665,7 @@ __all__ = ['_MV_ALL_MATCH_INFO_', 'MV_CC_FILE_ACCESS_PROGRESS',
            'MV_CC_STREAM_EXCEPTION_ABNORMAL_IMAGE', 'MV_CC_STREAM_EXCEPTION_LIST_OVERFLOW',
            'MV_CC_STREAM_EXCEPTION_LIST_EMPTY', 'MV_CC_STREAM_EXCEPTION_RECONNECTION',
            'MV_CC_STREAM_EXCEPTION_DISCONNECTED', 'MV_CC_STREAM_EXCEPTION_DEVICE', 
+           'MV_CC_STREAM_EXCEPTION_PARTIAL_IMAGE', 'MV_CC_STREAM_EXCEPTION_IMAGE_BUFFER_OVERFLOW', 
            '_MV_IMAGE_RECONSTRUCTION_METHOD_', 'MV_IMAGE_RECONSTRUCTION_METHOD', 'MV_SPLIT_BY_LINE',
            'MVCC_COLORF', '_MVCC_COLORF', '_MVCC_POINTF', 'MVCC_POINTF', '_MVCC_RECT_INFO', 'MVCC_RECT_INFO',
            '_MVCC_CIRCLE_INFO', 'MVCC_CIRCLE_INFO', '_MVCC_LINES_INFO', 'MVCC_LINES_INFO', '_MV_OUTPUT_IMAGE_INFO_',
@@ -1582,4 +1688,13 @@ __all__ = ['_MV_ALL_MATCH_INFO_', 'MV_CC_FILE_ACCESS_PROGRESS',
            '_MVCC_NODE_ERROR_T', 'MVCC_NODE_ERROR', 
            '_MVCC_NODE_ERROR_LIST_T','MVCC_NODE_ERROR_LIST', 
            '_MVCC_ENUMVALUE_EX_T', 'MVCC_ENUMVALUE_EX',
+            '_MV_FRAME_EXTRA_INFO_TYPE_', 'MV_FRAME_EXTRA_INFO_TYPE',
+            '_MV_GIGE_ZONE_DIRECTION_', 'MV_GIGE_ZONE_DIRECTION',
+            '_MV_GIGE_ZONE_INFO_', 'MV_GIGE_ZONE_INFO',
+            'N19_MV_GIGE_ZONE_INFO_3DOT_1E', 
+            'N30_MV_GIGE_MULRI_PART_DATA_INFO_3DOT_2E',
+            'N30_MV_GIGE_MULRI_PART_DATA_INFO_3DOT_3E',
+            'MV_GIGE_PART_DATA_INFO', 
+            '_MV_GIGE_MULTI_PART_DATA_TYPE_', 'MV_GIGE_MULTI_PART_DATA_TYPE',
+            '_MV_GIGE_MULTI_PART_INFO_', 'MV_GIGE_MULTI_PART_INFO',
            '_MV_CC_STREAM_EXCEPTION_INFO_T_','MV_CC_STREAM_EXCEPTION_INFO']
