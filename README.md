@@ -10,3 +10,11 @@ Anaconda3-2025.06-0-Linux-x86_64
 
 MVS_Linux_STD_V4.6.1_251113
 
+
+pip install pyside6
+pip install numpy
+pip install opencv-python
+pip install sympy
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install --upgrade ultralytics
+sudo apt-get install -y libxcb-cursor0 libxcb-xinerama0 libxcb-icccm4 libxcb-keysyms1 libxcb-image0 libxcb-render-util0 libxcb-xkb1 libxkbcommon-x11-0
