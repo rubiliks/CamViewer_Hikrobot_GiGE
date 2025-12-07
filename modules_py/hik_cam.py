@@ -4,7 +4,7 @@ import logging
 
 from PySide6.QtCore import QObject, Signal, Slot
 from sympy import false
-from MvCameraControl_class import *
+from MvImport.MvCameraControl_class import *
 
 logger = logging.getLogger(__name__)
 
@@ -87,12 +87,76 @@ class HikCam(QObject):
             logger.info("set trigger mode off")
 
         # Set gain mode
-        ret = self.cam.MV_CC_SetEnumValue("GainAuto", MV_GAIN_MODE_OFF)
+        #ret = self.cam.MV_CC_SetEnumValue("GainAuto", MV_GAIN_MODE_OFF)
+        #if ret != 0:
+        #    logger.error("set GainAuto mode fail! ret[0x%x]" % ret)
+        #    sys.exit()
+        #else:
+        #    logger.info("set GainAuto mode off")
+
+        #set PixelFormat  BayerRG8 - 0x01080009
+        ret = self.cam.MV_CC_SetEnumValue("PixelFormat",0x01080009)
         if ret != 0:
-            logger.error("set GainAuto mode fail! ret[0x%x]" % ret)
+            logger.error("set PixelFormat fail! ret[0x%x]" % ret)
             sys.exit()
         else:
-            logger.info("set GainAuto mode off")
+            logger.info("set PixelFormat BayerRG8" )
+
+        #set balance white auto BalanceWhiteAuto - Off - 0
+        ret = self.cam.MV_CC_SetEnumValue("BalanceWhiteAuto", 0)
+        if ret != 0:
+            logger.error("set BalanceWhiteAuto fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info("set BalanceWhiteAuto Off - 0")
+
+        #set Balance Ratio Selector  red  - 0
+        ret = self.cam.MV_CC_SetEnumValue("BalanceRatioSelector", 0)
+        if ret != 0:
+            logger.error("set BalanceRatioSelector fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info("set BalanceRatioSelector Red - 0")
+
+        #set red BalanceRatio
+        ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio",1460)
+        if ret != 0:
+            logger.error("set BalanceRatio fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info("set BalanceRatio Red")
+
+        # set Balance Ratio Selector  green - 1
+        ret = self.cam.MV_CC_SetEnumValue("BalanceRatioSelector", 1)
+        if ret != 0:
+            logger.error("set BalanceRatioSelector fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info("set BalanceRatioSelector Green - 1")
+
+        # set green BalanceRatio
+        ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio", 1024)
+        if ret != 0:
+            logger.error("set BalanceRatio fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info("set BalanceRatio Green")
+
+        # set Balance Ratio Selector  blue - 2
+        ret = self.cam.MV_CC_SetEnumValue("BalanceRatioSelector", 2)
+        if ret != 0:
+            logger.error("set BalanceRatioSelector fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info("set BalanceRatioSelector Blue - 2")
+
+        # set blue BalanceRatio
+        ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio", 1957)
+        if ret != 0:
+            logger.error("set BalanceRatio fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info("set BalanceRatio Blue")
 
         # Set BalanceWhiteAuto as off
         ret = self.cam.MV_CC_SetEnumValue("BalanceWhiteAuto", MV_BALANCEWHITE_AUTO_OFF)
