@@ -9,6 +9,13 @@ class Setting():
         self.jsonSettingPath =''
         self.cameraSettingGain = 0.0
         self.cameraSettingExposureTime = 0
+        self.cameraSettingBalanceRed = 0
+        self.cameraSettingBalanceGreen = 0
+        self.cameraSettingBalanceBlue = 0
+        self.cameraSettingWidth = 0
+        self.cameraSettingHeight = 0
+        self.cameraSettingOffsetX = 0
+        self.cameraSettingOffsetY = 0
         self.confige = ''
         self.cnnPath = ''
 
@@ -25,6 +32,13 @@ class Setting():
             self.confige = config = json.load(file)
             self.cameraSettingGain = config['cameraSetting']['gain']
             self.cameraSettingExposureTime = config['cameraSetting']['exposureTime']
+            self.cameraSettingBalanceRed = config['cameraSetting']['BalanceRed']
+            self.cameraSettingBalanceGreen = config['cameraSetting']['BalanceGreen']
+            self.cameraSettingBalanceBlue = config['cameraSetting']['BalanceBlue']
+            self.cameraSettingWidth = config['cameraSetting']['Width']
+            self.cameraSettingHeight = config['cameraSetting']['Height']
+            self.cameraSettingOffsetX = config['cameraSetting']['OffsetX']
+            self.cameraSettingOffsetY = config['cameraSetting']['OffsetY']
             self.cnnPath = config['CnnSetting']['cnnPath']
 
     def write_setting_gain(self, gain_link):
@@ -37,6 +51,20 @@ class Setting():
         with open(self.jsonSettingPath, "w") as file:
             json.dump(self.confige, file)
 
+    def write_setting_BalanceRed(self, BalanceRed_link):
+        self.confige['cameraSetting']['BalanceRed'] = BalanceRed_link
+        with open(self.jsonSettingPath, "w") as file:
+            json.dump(self.confige, file)
+
+    def write_setting_BalanceGreen(self, BalanceGreen_link):
+        self.confige['cameraSetting']['BalanceGreen'] = BalanceGreen_link
+        with open(self.jsonSettingPath, "w") as file:
+            json.dump(self.confige, file)
+
+    def write_setting_BalanceBlue(self, BalanceBlue_link):
+        self.confige['cameraSetting']['BalanceBlue'] = BalanceBlue_link
+        with open(self.jsonSettingPath, "w") as file:
+            json.dump(self.confige, file)
 
 
 

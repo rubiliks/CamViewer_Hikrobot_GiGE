@@ -22,6 +22,9 @@ class HikCam(QObject):
         self.stDeviceList = 0
         self.ExposureTime = 5000
         self.Gain = 2.0
+        self.BalanceRed = 1460
+        self.BalanceGreen = 1024
+        self.BalanceBlue = 1957
         self.cam_now_connect = False
         self.cam_find = False
 
@@ -150,6 +153,14 @@ class HikCam(QObject):
         else:
             logger.info("set BalanceRatioSelector Blue - 2")
 
+        # set Exposure Time Mode Standard =0
+        ret = self.cam.MV_CC_SetEnumValue("ExposureTimeMode", 0)
+        if ret != 0:
+            logger.error("set ExposureTimeMode fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info("set ExposureTimeMode Mode Standard - 0")
+
         # set blue BalanceRatio
         ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio", 1957)
         if ret != 0:
@@ -261,3 +272,17 @@ class HikCam(QObject):
 
     def get_gain(self,value):
         self.Gain = value
+
+    def get_BalanceRed(self,value):
+        self.BalanceRed = value
+
+    def get_BalanceGreen(self,value):
+        self.BalanceGreen = value
+
+    def get_BalanceBlue(self,value):
+        self.BalanceBlue = value
+
+
+
+
+
