@@ -97,6 +97,22 @@ class HikCam(QObject):
         #else:
         #    logger.info("set GainAuto mode off")
 
+        # set Exposure Time Mode Standard =0
+        #ret = self.cam.MV_CC_SetEnumValue("ExposureTimeMode", 0)
+        #if ret != 0:
+        #    logger.error("set ExposureTimeMode fail! ret[0x%x]" % ret)
+        #    sys.exit()
+        #else:
+        #    logger.info("set ExposureTimeMode Mode Standard - 0")
+
+        # set Preamp Gain 3200
+        ret = self.cam.MV_CC_SetEnumValue("PreampGain", 2400)
+        if ret != 0:
+            logger.error("set PreampGain fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info("set PreampGainMode 3.2")
+
         #set PixelFormat  BayerRG8 - 0x01080009
         ret = self.cam.MV_CC_SetEnumValue("PixelFormat",0x01080009)
         if ret != 0:
@@ -152,14 +168,6 @@ class HikCam(QObject):
             sys.exit()
         else:
             logger.info("set BalanceRatioSelector Blue - 2")
-
-        # set Exposure Time Mode Standard =0
-        ret = self.cam.MV_CC_SetEnumValue("ExposureTimeMode", 0)
-        if ret != 0:
-            logger.error("set ExposureTimeMode fail! ret[0x%x]" % ret)
-            sys.exit()
-        else:
-            logger.info("set ExposureTimeMode Mode Standard - 0")
 
         # set blue BalanceRatio
         ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio", 1957)

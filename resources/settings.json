@@ -1,1 +1,1 @@
-{"cameraSetting": {"gain": 5.0, "exposureTime": 5000,"BalanceRed":1460,"BalanceGreen":1024,"BalanceBlue":1957,"Width":720,"Height":540,"OffsetX":0,"OffsetY":0}, "CnnSetting": {"cnnPath": "./resources/yolov8s.engine"}, "AppSetting": {"appPathSetting": "resources/settings.json"}}
+{"cameraSetting": {"gain": 0.0, "exposureTime": 40, "BalanceRed": 1460, "BalanceGreen": 1024, "BalanceBlue": 1957, "Width": 720, "Height": 540, "OffsetX": 0, "OffsetY": 0}, "CnnSetting": {"cnnPath": "./resources/yolov8s.engine"}, "AppSetting": {"appPathSetting": "resources/settings.json"}}
