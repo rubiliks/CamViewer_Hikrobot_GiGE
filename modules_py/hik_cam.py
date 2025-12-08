@@ -20,8 +20,8 @@ class HikCam(QObject):
         self.deviceList = MV_CC_DEVICE_INFO_LIST()
         self.mem_connect = False
         self.stDeviceList = 0
-        self.ExposureTime = 5000
-        self.Gain = 2.0
+        self.ExposureTime = 40
+        self.Gain = 23.98
         self.BalanceRed = 1460
         self.BalanceGreen = 1024
         self.BalanceBlue = 1957
@@ -255,7 +255,7 @@ class HikCam(QObject):
                 sys.exit()
             return img_buff
         else:
-            imageError = cv2.imread('./resources/no_cam_connect.jpg')
+            imageError = cv2.imread('./resources/no_cam_connect.png')
             logger.error("no data[0x%x]" % ret)
             return imageError
 

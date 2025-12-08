@@ -1,3 +1,4 @@
+import cv2
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QTimer
 from MvImport.MvCameraControl_class import *
@@ -31,35 +32,35 @@ def cam_status_block_button_ui(ui_link):
         ui_link.pushButtonConnectCam.setEnabled(False)
     else:ui_link.pushButtonConnectCam.setEnabled(True)
 
-    if ui_link.gain_doubleSpinBox.isEnabled():
-        ui_link.gain_doubleSpinBox.setEnabled(False)
+    if ui_link.gainDoubleSpinBox.isEnabled():
+        ui_link.gainDoubleSpinBox.setEnabled(False)
     else:
-        ui_link.gain_doubleSpinBox.setEnabled(True)
+        ui_link.gainDoubleSpinBox.setEnabled(True)
 
     if ui_link.exposureTime_spinBox.isEnabled():
         ui_link.exposureTime_spinBox.setEnabled(False)
     else:
         ui_link.exposureTime_spinBox.setEnabled(True)
 
-    if ui_link.searchCam.isEnabled():
-        ui_link.searchCam.setEnabled(False)
+    if ui_link.pushButtonsearchCam.isEnabled():
+        ui_link.pushButtonsearchCam.setEnabled(False)
     else:
-        ui_link.searchCam.setEnabled(True)
+        ui_link.pushButtonsearchCam.setEnabled(True)
 
 def cnn_status_button_ui(ui_link):
     if ui_link.pushButtonStopObjDetectCnn.isEnabled():
         ui_link.pushButtonStartObjDetectCnn.setEnabled(True)
         ui_link.pushButtonStopObjDetectCnn.setEnabled(False)
-        ui_link.label.clear()
+        ui_link.CameraLabel.clear()
         ui_link.cnnStatusProgressBar.setValue(0)
-        ui_link.Cnn_path_qlineEdit.setEnabled(True)
-        ui_link.ApplyCNNpushButton.setEnabled(True)
+        ui_link.cnnPathQlineEdit.setEnabled(True)
+        #ui_link.ApplyCNNpushButton.setEnabled(True)
     else:
         ui_link.pushButtonStartObjDetectCnn.setEnabled(False)
         ui_link.pushButtonStopObjDetectCnn.setEnabled(True)
         ui_link.cnnStatusProgressBar.setValue(100)
-        ui_link.Cnn_path_qlineEdit.setEnabled(False)
-        ui_link.ApplyCNNpushButton.setEnabled(False)
+        ui_link.cnnPathQlineEdit.setEnabled(False)
+        #ui_link.ApplyCNNpushButton.setEnabled(False)
 
 def cnn_apply_cnn_path (cnn_link,cnn_path):
     cnn_link.create_model(cnn_path)
@@ -68,14 +69,14 @@ def cnn_apply_cnn_path (cnn_link,cnn_path):
 def cam_status_block_serch_came(ui_link):
     if not ui_link.pushButtonConnectCam.isEnabled():
         ui_link.pushButtonConnectCam.setEnabled(True)
-        ui_link.Cam_find_label.setText("Cam finded!")
+        ui_link.camFindLabel.setText("Cam finded!")
 
 def cam_status_not_find_came(ui_link):
     ui_link.pushButtonConnectCam.setEnabled(False)
-    ui_link.Cam_find_label.setText("Cam not find")
+    ui_link.camFindLabel.setText("Cam not find")
 
 def change_gain_setting(ui_link,setting_link):
-    setting_link.write_setting_gain(ui_link.gain_doubleSpinBox.value())
+    setting_link.write_setting_gain(ui_link.gainDoubleSpinBox.value())
 
 def change_exposure_setting(ui_link,setting_link):
     setting_link.write_setting_exposure(ui_link.exposureTime_spinBox.value())
@@ -101,44 +102,47 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(window)
     window.setWindowTitle("Hikrobot Camera Viewer")
-    window.minimumSize()
     window.show()
     #Экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(30)
-    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.label))
+    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.CameraLabel))
     #Cоеднение ui кнопок камеры
-    ui.searchCam.clicked.connect(lambda:hikCamera1.update_cam_list())
+
+    ui.pushButtonsearchCam.clicked.connect(lambda:hikCamera1.update_cam_list())
     ui.pushButtonConnectCam.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
     ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
+
     # Cоеднение ui настроек камеры
-    ui.gain_doubleSpinBox.setRange(0.0,20.0)
-    ui.gain_doubleSpinBox.setValue(setting1.cameraSettingGain)
-    ui.gain_doubleSpinBox.valueChanged.connect(hikCamera1.get_gain)
+    ui.gainDoubleSpinBox.setRange(0.0,23.98)
+    ui.gainDoubleSpinBox.setValue(setting1.cameraSettingGain)
+    ui.gainDoubleSpinBox.valueChanged.connect(hikCamera1.get_gain)
+    ui.gainDoubleSpinBox.valueChanged.connect(lambda: change_gain_setting(ui, setting1))
+
     ui.exposureTime_spinBox.setRange(0,20000)
     ui.exposureTime_spinBox.setValue(setting1.cameraSettingExposureTime)
     ui.exposureTime_spinBox.valueChanged.connect(hikCamera1.get_exposure)
-    ui.gain_doubleSpinBox.valueChanged.connect(lambda:change_gain_setting(ui,setting1))
     ui.exposureTime_spinBox.valueChanged.connect(lambda: change_exposure_setting(ui, setting1))
+
     ui.pushButtonDisconectCam.setEnabled(False)
     ui.cameraStatusProgressBar.setValue(0)
     ui.cnnStatusProgressBar.setValue(0)
     ui.pushButtonStopObjDetectCnn.setEnabled(False)
-    ui.lineEdit.setEnabled(False)
+    ui.settingPathlineEdit.setEnabled(False)
 
     # Соединение кнопок нейросети
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:timer.start())
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:cnn_status_button_ui(ui))
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda: cnn_status_button_ui(ui))
-    ui.ApplyCNNpushButton.clicked.connect(lambda:cnn_apply_cnn_path(cnn1,setting1.cnnPath))
+    #ui.ApplyCNNpushButton.clicked.connect(lambda:cnn_apply_cnn_path(cnn1,setting1.cnnPath))
 
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)
     hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))
     hikCamera1.cam_finded_camera_sig.connect(lambda:cam_status_block_serch_came(ui))
     hikCamera1.cam_not_finded_sig.connect(lambda:cam_status_not_find_came(ui))
-    ui.Cam_find_label.setText('No Camera Find')
+    ui.camFindLabel.setText('No Camera Find')
     logger.info("App started")
 
 

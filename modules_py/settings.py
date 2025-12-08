@@ -7,12 +7,11 @@ logger = logging.getLogger(__name__)
 class Setting():
     def __init__(self):
         self.jsonSettingPath =''
-        self.cameraSettingGain = 0.0
-        self.cameraSettingExposureTime = 0
-        self.cameraSettingBalanceRed = 0
-        self.cameraSettingBalanceGreen = 0
-        self.cameraSettingBalanceBlue = 0
-        self.cameraSettingWidth = 0
+        self.cameraSettingGain = 23.98
+        self.cameraSettingExposureTime = 40
+        self.cameraSettingBalanceRed = 1460
+        self.cameraSettingBalanceGreen = 1024
+        self.cameraSettingBalanceBlue = 1957
         self.cameraSettingHeight = 0
         self.cameraSettingOffsetX = 0
         self.cameraSettingOffsetY = 0

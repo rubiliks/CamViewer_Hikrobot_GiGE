@@ -69,7 +69,12 @@ class CnnYolo():
             execution_time = end_time - start_time
             fps = 1 / execution_time
             cv2.putText(annotated_frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            q_image = QImage(annotated_frame.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
+            resized = cv2.resize(annotated_frame, (1545, 386))
+            #q_image = QImage(annotated_frame.data, widthImg, heightImg, bytes_per_lineImg, QImage.Format_RGB888)
+            heightImgDispla, widthImgDispla, channelsImgDispla = resized.shape
+            bytes_per_lineImgDispla = channelsImgDispla * widthImgDispla
+
+            q_image = QImage(resized.data, widthImgDispla, heightImgDispla, bytes_per_lineImgDispla, QImage.Format_RGB888)
             q_pixmap = QPixmap.fromImage(q_image)
             q_pixmap2 = q_pixmap.copy()
             return q_pixmap2, self.obj_list
