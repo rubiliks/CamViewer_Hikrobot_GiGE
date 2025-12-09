@@ -36,7 +36,7 @@
           <enum>QTabWidget::TabShape::Rounded</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>2</number>
          </property>
          <property name="tabsClosable">
           <bool>false</bool>
@@ -237,20 +237,6 @@
                        </item>
                        <item>
                         <widget class="QSpinBox" name="OffsetXspinBox"/>
-                       </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_15">
-                       <item>
-                        <widget class="QLabel" name="OffsetYlabel">
-                         <property name="text">
-                          <string>Offset Y</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QSpinBox" name="OffsetYspinBox"/>
                        </item>
                       </layout>
                      </item>

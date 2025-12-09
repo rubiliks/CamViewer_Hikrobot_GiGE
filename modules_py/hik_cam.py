@@ -25,6 +25,9 @@ class HikCam(QObject):
         self.BalanceRed = 1460
         self.BalanceGreen = 1024
         self.BalanceBlue = 1957
+        self.Width = 4096
+        self.Height = 1000
+        self.OffsetX = 10
         self.cam_now_connect = False
         self.cam_find = False
 
@@ -208,6 +211,31 @@ class HikCam(QObject):
             sys.exit()
         else:
             logger.info(f"set Gain {self.Gain}")
+
+        #Set Width
+        ret = self.cam.MV_CC_SetIntValueEx("Width",self.Width )
+        if ret != 0:
+            logger.error("set Width fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info(f"set Width {self.Width}")
+
+        #Set Height
+        ret = self.cam.MV_CC_SetIntValueEx("Height",self.Height )
+        if ret != 0:
+            logger.error("set Height fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info(f"set Height {self.Height}")
+
+        #Set OffsetX
+        ret = self.cam.MV_CC_SetIntValueEx("OffsetX",self.OffsetX )
+        if ret != 0:
+            logger.error("set OffsetX fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info(f"set OffsetX {self.OffsetX}")
+
         # Start grabbing
         ret = self.cam.MV_CC_StartGrabbing()
         if ret != 0:
@@ -289,6 +317,15 @@ class HikCam(QObject):
 
     def set_BalanceBlue(self,value):
         self.BalanceBlue = value
+
+    def set_Height(self,value):
+        self.Height = value
+
+    def set_Width(self, value):
+        self.Width = value
+
+    def set_OffsetX(self,value):
+        self.OffsetX = value
 
 
 

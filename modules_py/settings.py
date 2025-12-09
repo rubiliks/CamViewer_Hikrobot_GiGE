@@ -64,5 +64,21 @@ class Setting():
         with open(self.jsonSettingPath, "w") as file:
             json.dump(self.confige, file)
 
+    def write_setting_Width(self, Width_link):
+        self.confige['cameraSetting']['Width'] = Width_link
+        with open(self.jsonSettingPath, "w") as file:
+            json.dump(self.confige, file)
+
+    def write_setting_Height(self, Height_link):
+        self.confige['cameraSetting']['Height'] = Height_link
+        with open(self.jsonSettingPath, "w") as file:
+            json.dump(self.confige, file)
+
+    def write_setting_OffsetX(self, OffsetX_link):
+        self.confige['cameraSetting']['OffsetX'] = OffsetX_link
+        with open(self.jsonSettingPath, "w") as file:
+            json.dump(self.confige, file)
+
+
 
 

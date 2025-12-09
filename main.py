@@ -47,6 +47,36 @@ def cam_status_block_button_ui(ui_link):
     else:
         ui_link.pushButtonsearchCam.setEnabled(True)
 
+    if ui_link.BalanceBuespinBox.isEnabled():
+        ui_link.BalanceBuespinBox.setEnabled(False)
+    else:
+        ui_link.BalanceBuespinBox.setEnabled(True)
+
+    if ui_link.BalanceRedSpinBox.isEnabled():
+        ui_link.BalanceRedSpinBox.setEnabled(False)
+    else:
+        ui_link.BalanceRedSpinBox.setEnabled(True)
+
+    if ui_link.BalanceGreenspinBox.isEnabled():
+        ui_link.BalanceGreenspinBox.setEnabled(False)
+    else:
+        ui_link.BalanceGreenspinBox.setEnabled(True)
+
+    if ui_link.OffsetXspinBox.isEnabled():
+        ui_link.OffsetXspinBox.setEnabled(False)
+    else:
+        ui_link.OffsetXspinBox.setEnabled(True)
+
+    if ui_link.HeightspinBox.isEnabled():
+        ui_link.HeightspinBox.setEnabled(False)
+    else:
+        ui_link.HeightspinBox.setEnabled(True)
+
+    if ui_link.WidthspinBox.isEnabled():
+        ui_link.WidthspinBox.setEnabled(False)
+    else:
+        ui_link.WidthspinBox.setEnabled(True)
+
 def cnn_status_button_ui(ui_link):
     if ui_link.pushButtonStopObjDetectCnn.isEnabled():
         ui_link.pushButtonStartObjDetectCnn.setEnabled(True)
@@ -89,6 +119,15 @@ def change_BalanceGreen_setting(ui_link,setting_link):
 
 def change_BalanceBlue_setting(ui_link,setting_link):
     setting_link.write_setting_BalanceBlue(ui_link.BalanceBuespinBox.value())
+
+def change_Width_setting(ui_link,setting_link):
+    setting_link.write_setting_Width(ui_link.WidthspinBox.value())
+
+def change_Height_setting(ui_link,setting_link):
+    setting_link.write_setting_Height(ui_link.HeightSpinBox.value())
+
+def change_OffsetX_setting(ui_link,setting_link):
+    setting_link.write_setting_OffsetX(ui_link.HeightSpinBox.value())
 
 if __name__ == "__main__":
     logger.info("Start app")
@@ -154,6 +193,25 @@ if __name__ == "__main__":
     hikCamera1.set_BalanceBlue(setting1.cameraSettingBalanceBlue)
     ui.BalanceBuespinBox.valueChanged.connect(hikCamera1.set_BalanceBlue)
     ui.BalanceBuespinBox.valueChanged.connect(lambda:change_BalanceBlue_setting(ui, setting1))
+    # Width
+    ui.WidthspinBox.setRange(128,4096)
+    ui.WidthspinBox.setValue(setting1.cameraSettingWidth)
+    hikCamera1.set_Width(setting1.cameraSettingWidth)
+    ui.WidthspinBox.valueChanged.connect(hikCamera1.set_Width)
+    ui.WidthspinBox.valueChanged.connect(lambda:change_Width_setting(ui, setting1))
+    #Height
+    ui.HeightspinBox.setRange(2,2000)
+    ui.HeightspinBox.setValue(setting1.cameraSettingHeight)
+    hikCamera1.set_Height(setting1.cameraSettingHeight)
+    ui.HeightspinBox.valueChanged.connect(hikCamera1.set_Height)
+    ui.HeightspinBox.valueChanged.connect(lambda:change_Height_setting(ui, setting1))
+    #OffsetX
+    ui.OffsetXspinBox.setRange(0,4096)
+    ui.OffsetXspinBox.setValue(setting1.cameraSettingOffsetX)
+    hikCamera1.set_OffsetX(setting1.cameraSettingOffsetX)
+    ui.OffsetXspinBox.valueChanged.connect(hikCamera1.set_OffsetX)
+    ui.OffsetXspinBox.valueChanged.connect(lambda:change_OffsetX_setting(ui, setting1))
+
 
 
 
