@@ -20,7 +20,7 @@ class HikCam(QObject):
         self.deviceList = MV_CC_DEVICE_INFO_LIST()
         self.mem_connect = False
         self.stDeviceList = 0
-        self.ExposureTime = 40
+        self.ExposureTime = 100
         self.Gain = 23.98
         self.BalanceRed = 1460
         self.BalanceGreen = 1024
@@ -137,8 +137,8 @@ class HikCam(QObject):
         else:
             logger.info("set BalanceRatioSelector Red - 0")
 
-        #set red BalanceRatio
-        ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio",1460)
+        #set red BalanceRatio 869 base
+        ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio",self.BalanceRed )
         if ret != 0:
             logger.error("set BalanceRatio fail! ret[0x%x]" % ret)
             sys.exit()
@@ -153,8 +153,8 @@ class HikCam(QObject):
         else:
             logger.info("set BalanceRatioSelector Green - 1")
 
-        # set green BalanceRatio
-        ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio", 1024)
+        # set green BalanceRatio 1024
+        ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio", self.BalanceGreen)
         if ret != 0:
             logger.error("set BalanceRatio fail! ret[0x%x]" % ret)
             sys.exit()
@@ -169,8 +169,8 @@ class HikCam(QObject):
         else:
             logger.info("set BalanceRatioSelector Blue - 2")
 
-        # set blue BalanceRatio
-        ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio", 1957)
+        # set blue BalanceRatio 1881
+        ret = self.cam.MV_CC_SetIntValueEx("BalanceRatio", self.BalanceBlue)
         if ret != 0:
             logger.error("set BalanceRatio fail! ret[0x%x]" % ret)
             sys.exit()
@@ -275,19 +275,19 @@ class HikCam(QObject):
             logger.info("handle destroy")
             self.cam_сon_discon_sig.emit()
 
-    def get_exposure(self,value):
+    def set_exposure(self,value):
         self.ExposureTime =  value
 
-    def get_gain(self,value):
+    def set_gain(self,value):
         self.Gain = value
 
-    def get_BalanceRed(self,value):
+    def set_BalanceRed(self,value):
         self.BalanceRed = value
 
-    def get_BalanceGreen(self,value):
+    def set_BalanceGreen(self,value):
         self.BalanceGreen = value
 
-    def get_BalanceBlue(self,value):
+    def set_BalanceBlue(self,value):
         self.BalanceBlue = value
 
 

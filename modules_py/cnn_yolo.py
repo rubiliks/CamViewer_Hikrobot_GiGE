@@ -56,7 +56,6 @@ class CnnYolo():
                         "confidence": confidence,
                         "class_id": class_id,
                         "class_name": class_name,
-                        "counter_obj":counter_obj,
                         "timestamp": datetime.now().isoformat()
                     }
                     self.obj_list.append(obj_data)

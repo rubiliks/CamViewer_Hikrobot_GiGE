@@ -12,9 +12,9 @@ class Setting():
         self.cameraSettingBalanceRed = 1460
         self.cameraSettingBalanceGreen = 1024
         self.cameraSettingBalanceBlue = 1957
-        self.cameraSettingHeight = 0
-        self.cameraSettingOffsetX = 0
-        self.cameraSettingOffsetY = 0
+        self.cameraSettingWidth = 4096
+        self.cameraSettingHeight = 1000
+        self.cameraSettingOffsetX = 100
         self.confige = ''
         self.cnnPath = ''
 
@@ -37,7 +37,6 @@ class Setting():
             self.cameraSettingWidth = config['cameraSetting']['Width']
             self.cameraSettingHeight = config['cameraSetting']['Height']
             self.cameraSettingOffsetX = config['cameraSetting']['OffsetX']
-            self.cameraSettingOffsetY = config['cameraSetting']['OffsetY']
             self.cnnPath = config['CnnSetting']['cnnPath']
 
     def write_setting_gain(self, gain_link):

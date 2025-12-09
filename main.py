@@ -81,6 +81,14 @@ def change_gain_setting(ui_link,setting_link):
 def change_exposure_setting(ui_link,setting_link):
     setting_link.write_setting_exposure(ui_link.exposureTime_spinBox.value())
 
+def change_BalanceRed_setting(ui_link,setting_link):
+    setting_link.write_setting_BalanceRed(ui_link.BalanceRedSpinBox.value())
+
+def change_BalanceGreen_setting(ui_link,setting_link):
+    setting_link.write_setting_BalanceGreen(ui_link.BalanceGreenspinBox.value())
+
+def change_BalanceBlue_setting(ui_link,setting_link):
+    setting_link.write_setting_BalanceBlue(ui_link.BalanceBuespinBox.value())
 
 if __name__ == "__main__":
     logger.info("Start app")
@@ -102,7 +110,9 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(window)
     window.setWindowTitle("Hikrobot Camera Viewer")
+    window.resize(4000,4000)
     window.show()
+
     #Экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(30)
@@ -114,15 +124,39 @@ if __name__ == "__main__":
     ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
 
     # Cоеднение ui настроек камеры
+    # Gain
     ui.gainDoubleSpinBox.setRange(0.0,23.98)
     ui.gainDoubleSpinBox.setValue(setting1.cameraSettingGain)
-    ui.gainDoubleSpinBox.valueChanged.connect(hikCamera1.get_gain)
+    hikCamera1.set_gain(setting1.cameraSettingGain)
+    ui.gainDoubleSpinBox.valueChanged.connect(hikCamera1.set_gain)
     ui.gainDoubleSpinBox.valueChanged.connect(lambda: change_gain_setting(ui, setting1))
-
+    # Expusure
     ui.exposureTime_spinBox.setRange(0,20000)
     ui.exposureTime_spinBox.setValue(setting1.cameraSettingExposureTime)
-    ui.exposureTime_spinBox.valueChanged.connect(hikCamera1.get_exposure)
+    hikCamera1.set_exposure(setting1.cameraSettingExposureTime)
+    ui.exposureTime_spinBox.valueChanged.connect(hikCamera1.set_exposure)
     ui.exposureTime_spinBox.valueChanged.connect(lambda: change_exposure_setting(ui, setting1))
+    # Balance Red
+    ui.BalanceRedSpinBox.setRange(0,3000)
+    ui.BalanceRedSpinBox.setValue(setting1.cameraSettingBalanceRed)
+    hikCamera1.set_BalanceRed(setting1.cameraSettingBalanceRed)
+    ui.BalanceRedSpinBox.valueChanged.connect(hikCamera1.set_BalanceRed)
+    ui.BalanceRedSpinBox.valueChanged.connect(lambda:change_BalanceRed_setting(ui, setting1))
+    # Balance Green
+    ui.BalanceGreenspinBox.setRange(0,3000)
+    ui.BalanceGreenspinBox.setValue(setting1.cameraSettingBalanceGreen)
+    hikCamera1.set_BalanceGreen(setting1.cameraSettingBalanceGreen)
+    ui.BalanceGreenspinBox.valueChanged.connect(hikCamera1.set_BalanceGreen)
+    ui.BalanceGreenspinBox.valueChanged.connect(lambda:change_BalanceGreen_setting(ui, setting1))
+    # Balance Blue
+    ui.BalanceBuespinBox.setRange(0,3000)
+    ui.BalanceBuespinBox.setValue(setting1.cameraSettingBalanceBlue)
+    hikCamera1.set_BalanceBlue(setting1.cameraSettingBalanceBlue)
+    ui.BalanceBuespinBox.valueChanged.connect(hikCamera1.set_BalanceBlue)
+    ui.BalanceBuespinBox.valueChanged.connect(lambda:change_BalanceBlue_setting(ui, setting1))
+
+
+
 
     ui.pushButtonDisconectCam.setEnabled(False)
     ui.cameraStatusProgressBar.setValue(0)
@@ -143,7 +177,7 @@ if __name__ == "__main__":
     hikCamera1.cam_finded_camera_sig.connect(lambda:cam_status_block_serch_came(ui))
     hikCamera1.cam_not_finded_sig.connect(lambda:cam_status_not_find_came(ui))
     ui.camFindLabel.setText('No Camera Find')
+    ui.tabWidget.setCurrentWidget(ui.mainTab)
     logger.info("App started")
-
 
     sys.exit(app.exec())
