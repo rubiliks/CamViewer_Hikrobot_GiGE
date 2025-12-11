@@ -1,42 +1,59 @@
 import cv2
 from PySide6.QtWidgets import QApplication, QMainWindow
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, QThread
+from PySide6.QtCore import QThread
+
+
 from MvImport.MvCameraControl_class import *
 from modules_py.mainWindowSmir_ui import Ui_MainWindow
 from modules_py.hik_cam import  HikCam
 from modules_py.cnn_yolo import  CnnYolo
 from modules_py.settings import Setting
 import logging
+import time
+
 
 
 logging.basicConfig(filename='CamViewer_Hikrobot_GiGE.log', level=logging.DEBUG,format='%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+
+
+
+
+def run_in_thread():
+    while True:
+        print("Сообщение из потока")
+        time.sleep(0.02)  # Пауза 20 мс (0.02 сек)
+
+
+def cyclt_frame():
+    print("!!!!!!!!!!!!Cyclt Frame!!!!!!!!!!!!",time.time())
+
 def time_valve(hikcam_link1,objs_cnn_data1):
-    print(hikcam_link1.ResultingFrame)
-    print(hikcam_link1.ResultingLineRate)
+    #print(hikcam_link1.ResultingFrame)
+    #print(hikcam_link1.ResultingLineRate)
     secInLine = ((1 / hikcam_link1.ResultingFrame) / hikcam_link1.Height)
-    print(secInLine)
+    #print(secInLine)
     counterInt = 0
     valvesNumber = 80
     lengthToValvesBlock = 0.8 # metric
     ConveyorSpeed = 2.0 # m/s
     #valveBlockWidth = 2.0 # m
     valvesStep =  valvesNumber/hikcam_link1.Width
-    print(valvesStep)
+    #print(valvesStep)
     timeToOpen = lengthToValvesBlock/ConveyorSpeed
     objByTike = []
-
     for obj in objs_cnn_data1:
-        print(counterInt)
+        #print(counterInt)
         counterInt = counterInt + 1
-        print(obj['timestamp'])
-        print('y_center',obj['y_center'])
-        print('x_center',obj['x_center'])
+        #print(obj['timestamp'])
+        #print('y_center',obj['y_center'])
+        #print('x_center',obj['x_center'])
         deltaTime = obj['y_center'] * secInLine
-        print('delta time', deltaTime)
+        #print('delta time', deltaTime)
         valveTime = timeToOpen - deltaTime
-        print('valve time',valveTime)
+        #print('valve time',valveTime)
         selectValve = obj['x_center'] * valvesStep
         selectValveRound =  round(selectValve)
         obj_data = {
@@ -44,16 +61,23 @@ def time_valve(hikcam_link1,objs_cnn_data1):
             "selectValve":selectValveRound
         }
         objByTike.append(obj_data)
+    #print(objByTike)
+    #print('end')
+    return objByTike
 
-    print(objByTike)
-    print('end')
-
-def update_frame(hikcam_link,cnnyolo_link,lable_link):
+def update_frame(hikcam_link,cnnyolo_link,lable_link,objByTikeFrame_link):
     lable_frame = hikcam_link.get_one_frame()
     lable_detection,objs_cnn_data = cnnyolo_link.object_detection(lable_frame)
     lable_link.setPixmap(lable_detection)
-    time_valve(hikcam_link,objs_cnn_data)
+    objByTikeFrame = []
+    objByTikeFrame = time_valve(hikcam_link,objs_cnn_data).copy()
+    if len(objByTikeFrame) > 0:
+        objByTikeFrame_link.append(objByTikeFrame)
+        #print('objValveArray',objByTikeFrame_link)
+        #print('sizeOfobjValveArray',len(objByTikeFrame_link))
 
+    #print('frame',hikcam_link.ResultingFrame)
+    return objByTikeFrame_link
 
 def cam_status_block_button_ui(ui_link):
     if ui_link.cameraStatusProgressBar.value() == 0:
@@ -179,6 +203,7 @@ if __name__ == "__main__":
     cnn1 = CnnYolo()
     cnn1.check_envir()
     cnn1.create_model(setting1.cnnPath)
+    objByTikeFrame = []
 
     #Экземпляр ui
     window = QMainWindow()
@@ -190,8 +215,16 @@ if __name__ == "__main__":
 
     #Экземпляр таймера для получения кадра с камеры
     timer = QTimer()
-    timer.setInterval(30)
-    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.CameraLabel))
+    timer.setInterval(100)
+    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.CameraLabel,objByTikeFrame))
+
+    #Timer for frame
+    timerFrame = QTimer()
+    timerFrame.setInterval(500)
+    timerFrame.timeout.connect(cyclt_frame)
+
+
+
     #Cоеднение ui кнопок камеры
 
     ui.pushButtonsearchCam.clicked.connect(lambda:hikCamera1.update_cam_list())
@@ -257,6 +290,10 @@ if __name__ == "__main__":
     # Соединение кнопок нейросети
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:timer.start())
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
+
+    ui.pushButtonStartObjDetectCnn.clicked.connect(lambda: timerFrame.start())
+    ui.pushButtonStopObjDetectCnn.clicked.connect(lambda: timerFrame.stop())
+
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:cnn_status_button_ui(ui))
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda: cnn_status_button_ui(ui))
     #ui.ApplyCNNpushButton.clicked.connect(lambda:cnn_apply_cnn_path(cnn1,setting1.cnnPath))
@@ -269,5 +306,14 @@ if __name__ == "__main__":
     ui.camFindLabel.setText('No Camera Find')
     ui.tabWidget.setCurrentWidget(ui.mainTab)
     logger.info("App started")
+
+    #Thread valve
+    thread = QThread.create(run_in_thread)
+
+
+
+
+
+    app.aboutToQuit.connect(thread.quit)
 
     sys.exit(app.exec())
