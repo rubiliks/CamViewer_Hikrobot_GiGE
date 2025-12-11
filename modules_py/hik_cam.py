@@ -25,11 +25,14 @@ class HikCam(QObject):
         self.BalanceRed = 1460
         self.BalanceGreen = 1024
         self.BalanceBlue = 1957
+        self.ResultingLineRate = 0
+        self.ResultingFrame = 0.0
         self.Width = 4096
         self.Height = 1000
         self.OffsetX = 10
         self.cam_now_connect = False
         self.cam_find = False
+
 
     def update_cam_list(self):
         ret = self.cam.MV_CC_EnumDevices(MV_GIGE_DEVICE, self.deviceList)
@@ -235,6 +238,28 @@ class HikCam(QObject):
             sys.exit()
         else:
             logger.info(f"set OffsetX {self.OffsetX}")
+
+        #Get cam Resulting Frame Rate(Fps)
+        stFloatValue = MVCC_FLOATVALUE()
+        memset(byref(stFloatValue), 0, sizeof(MVCC_FLOATVALUE))
+        ret = self.cam.MV_CC_GetFloatValue("ResultingFrameRate",stFloatValue)
+        if ret != 0:
+            logger.error("get ResultingFrameRate fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            self.ResultingFrame = stFloatValue.fCurValue
+            logger.info(f"get ResultingFrameRate {self.ResultingFrame}")
+
+        #Get cam Resulting Resulting Line Rate(Hz)
+        stIntValue = MVCC_INTVALUE()
+        memset(byref(stIntValue), 0, sizeof(MVCC_INTVALUE))
+        ret = self.cam.MV_CC_GetIntValueEx("ResultingLineRate",stIntValue)
+        if ret != 0:
+            logger.error("get ResultingLineRate fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            self.ResultingLineRate = stIntValue.nCurValue
+            logger.info(f"get ResultingLineRate {self.ResultingLineRate}")
 
         # Start grabbing
         ret = self.cam.MV_CC_StartGrabbing()

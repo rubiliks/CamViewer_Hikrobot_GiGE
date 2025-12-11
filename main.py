@@ -12,11 +12,48 @@ import logging
 logging.basicConfig(filename='CamViewer_Hikrobot_GiGE.log', level=logging.DEBUG,format='%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+def time_valve(hikcam_link1,objs_cnn_data1):
+    print(hikcam_link1.ResultingFrame)
+    print(hikcam_link1.ResultingLineRate)
+    secInLine = ((1 / hikcam_link1.ResultingFrame) / hikcam_link1.Height)
+    print(secInLine)
+    counterInt = 0
+    valvesNumber = 80
+    lengthToValvesBlock = 0.8 # metric
+    ConveyorSpeed = 2.0 # m/s
+    #valveBlockWidth = 2.0 # m
+    valvesStep =  valvesNumber/hikcam_link1.Width
+    print(valvesStep)
+    timeToOpen = lengthToValvesBlock/ConveyorSpeed
+    objByTike = []
+
+    for obj in objs_cnn_data1:
+        print(counterInt)
+        counterInt = counterInt + 1
+        print(obj['timestamp'])
+        print('y_center',obj['y_center'])
+        print('x_center',obj['x_center'])
+        deltaTime = obj['y_center'] * secInLine
+        print('delta time', deltaTime)
+        valveTime = timeToOpen - deltaTime
+        print('valve time',valveTime)
+        selectValve = obj['x_center'] * valvesStep
+        selectValveRound =  round(selectValve)
+        obj_data = {
+            "valveTime": valveTime,
+            "selectValve":selectValveRound
+        }
+        objByTike.append(obj_data)
+
+    print(objByTike)
+    print('end')
 
 def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_frame = hikcam_link.get_one_frame()
     lable_detection,objs_cnn_data = cnnyolo_link.object_detection(lable_frame)
     lable_link.setPixmap(lable_detection)
+    time_valve(hikcam_link,objs_cnn_data)
+
 
 def cam_status_block_button_ui(ui_link):
     if ui_link.cameraStatusProgressBar.value() == 0:
@@ -94,7 +131,6 @@ def cnn_status_button_ui(ui_link):
 
 def cnn_apply_cnn_path (cnn_link,cnn_path):
     cnn_link.create_model(cnn_path)
-
 
 def cam_status_block_serch_came(ui_link):
     if not ui_link.pushButtonConnectCam.isEnabled():
@@ -211,10 +247,6 @@ if __name__ == "__main__":
     hikCamera1.set_OffsetX(setting1.cameraSettingOffsetX)
     ui.OffsetXspinBox.valueChanged.connect(hikCamera1.set_OffsetX)
     ui.OffsetXspinBox.valueChanged.connect(lambda:change_OffsetX_setting(ui, setting1))
-
-
-
-
 
     ui.pushButtonDisconectCam.setEnabled(False)
     ui.cameraStatusProgressBar.setValue(0)

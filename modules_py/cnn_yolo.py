@@ -49,6 +49,8 @@ class CnnYolo():
                     class_name = self.model.names[class_id]
                     # Данные объекта
                     obj_data = {
+                        "frame_width": widthImg,
+                        "frame_height": heightImg,
                         "x_center": x_center,
                         "y_center": y_center,
                         "width": width,
