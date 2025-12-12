@@ -2,7 +2,7 @@ import cv2
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QTimer, Signal, Slot
 from PySide6.QtCore import QThread
-
+from polars import self_dtype
 
 from MvImport.MvCameraControl_class import *
 from modules_py.mainWindowSmir_ui import Ui_MainWindow
@@ -11,6 +11,9 @@ from modules_py.cnn_yolo import  CnnYolo
 from modules_py.settings import Setting
 import logging
 import time
+
+from pymodbus.client import ModbusTcpClient
+
 
 logging.basicConfig(filename='CamViewer_Hikrobot_GiGE.log', level=logging.DEBUG,format='%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -23,41 +26,53 @@ class WorkerThread(QThread):
         self.test = False
         self.data_list_recive = []
         self.data_list = []
+        self.bool_list = [True] * 16
 
         self.receive_list_signal.connect(self.process_list)
     def run(self):
         self.test = True
-        while self.test:
-            if True: #(len(self.data_list)>0):
-                print(f'data {self.data_list}  \n')
-                for data in self.data_list:
-                    counter = 0
-                    for objsInframe in data:
-                        print(f'frame {counter} {objsInframe} \n')
-                        objCounter = 0
-                        for obj in objsInframe:
-                            obj["valveTime"] = obj["valveTime"] - 0.02
-                            print(f'obj{objCounter} {obj} \n')
-                            if obj["valveTime"] < 0.0:
-                                obj["valveOpen"] = True
-                            if obj["valveTime"] < - 1.0:
-                                obj["valveClose"] = False
-                                objsInframe.pop(objCounter)
-                                data.pop(objCounter)
-                        objCounter = objCounter + 1
-                    counter = counter + 1
-                print('data len',len(self.data_list))
-                countData = 0
-                for dataEmpty in self.data_list:
-                    if(dataEmpty == []):
-                        self.data_list.pop(countData)
+        client = ModbusTcpClient(
+            host='192.168.88.150',  # IP-адрес устройства
+            port=502,  # Стандартный порт Modbus TCP
+            timeout=3,  # Таймаут в секундах
+            retries=3  # Количество попыток переподключения
+        )
+        print('client',client)
 
+        result_read = client.read_discrete_inputs(
+            address=0,  # Начальный адрес
+            count=8,  # Количество битов (8 bits)
+            device_id=1  # ID устройства
+        )
+        print(result_read)
+
+        resule_write_coils = client.write_coils(4096,self.bool_list)
+        print(resule_write_coils)
+
+        while self.test:
+            print(f'data {self.data_list}  \n')
+            for objsInframe in self.data_list:
+                # print(f'frame {counter} {objsInframe} \n')
+                objCounter = 0
+                for obj in objsInframe:
+                    print(f'obj {obj} \n')
+                    obj["valveTime"] = obj["valveTime"] - 0.02
+                    # print(f'obj{objCounter} {obj} \n')yfpfl
+                    if obj["valveTime"] < 0.0:
+                        obj["valveOpen"] = True
+                    if obj["valveTime"] < - 1.0:
+                        obj["valveClose"] = False
+                        objsInframe.pop(objCounter)
+                objCounter = objCounter + 1
+                if objsInframe == []:
+                    self.data_list.pop()
             time.sleep(0.02)  # 20 мс
 
     def stop(self):
         self.test = False
 
     def process_list(self, data):
+        print("!!!!!!!!!!!!!!!!!!!!!!!!")
         self.data_list_recive.clear()
         self.data_list_recive = data.copy()
         self.data_list.append(self.data_list_recive)
@@ -83,6 +98,7 @@ def time_valve(hikcam_link1,objs_cnn_data1):
     #print(valvesStep)
     timeToOpen = lengthToValvesBlock/ConveyorSpeed
     objByTike = []
+    objByTike.clear()
     for obj in objs_cnn_data1:
         #print(counterInt)
         counterInt = counterInt + 1
@@ -105,7 +121,7 @@ def time_valve(hikcam_link1,objs_cnn_data1):
     #print('end')
     return objByTike
 
-def update_frame(hikcam_link,cnnyolo_link,lable_link,objByTikeFrame_link):
+def update_frame(hikcam_link,cnnyolo_link,lable_link):
     lable_frame = hikcam_link.get_one_frame()
     lable_detection,objs_cnn_data = cnnyolo_link.object_detection(lable_frame)
     lable_link.setPixmap(lable_detection)
@@ -113,13 +129,11 @@ def update_frame(hikcam_link,cnnyolo_link,lable_link,objByTikeFrame_link):
     objByTikeFrame.clear()
     objByTikeFrame = time_valve(hikcam_link,objs_cnn_data).copy()
     if len(objByTikeFrame) > 0:
-        objByTikeFrame_link.append(objByTikeFrame)
-        thread.receive_list_signal.emit(objByTikeFrame_link.copy())
-        #print('objValveArray',objByTikeFrame_link)
+        thread.receive_list_signal.emit(objByTikeFrame.copy())
+        print('objValveArray',objByTikeFrame)
         #print('sizeOfobjValveArray',len(objByTikeFrame_link))
-
     #print('frame',hikcam_link.ResultingFrame)
-    return objByTikeFrame_link
+
 
 def cam_status_block_button_ui(ui_link):
     if ui_link.cameraStatusProgressBar.value() == 0:
@@ -245,7 +259,6 @@ if __name__ == "__main__":
     cnn1 = CnnYolo()
     cnn1.check_envir()
     cnn1.create_model(setting1.cnnPath)
-    objByTikeFrame = []
 
     #Экземпляр ui
     window = QMainWindow()
@@ -258,7 +271,7 @@ if __name__ == "__main__":
     #Экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(100)
-    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.CameraLabel,objByTikeFrame))
+    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.CameraLabel))
 
     #Thread valve
     thread = WorkerThread()
