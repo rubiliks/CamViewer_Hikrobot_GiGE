@@ -1,6 +1,6 @@
 import cv2
 from PySide6.QtWidgets import QApplication, QMainWindow
-from PySide6.QtCore import QTimer, QThread
+from PySide6.QtCore import QTimer, Signal, Slot
 from PySide6.QtCore import QThread
 
 
@@ -12,23 +12,62 @@ from modules_py.settings import Setting
 import logging
 import time
 
-
-
 logging.basicConfig(filename='CamViewer_Hikrobot_GiGE.log', level=logging.DEBUG,format='%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# В PySide6 обязательно нужно наследоваться от QThread для переопределения run()
+class WorkerThread(QThread):
+    receive_list_signal = Signal(list)
+    def __init__(self):
+        super().__init__()
+        self.test = False
+        self.data_list_recive = []
+        self.data_list = []
 
+        self.receive_list_signal.connect(self.process_list)
+    def run(self):
+        self.test = True
+        while self.test:
+            if True: #(len(self.data_list)>0):
+                print(f'data {self.data_list}  \n')
+                for data in self.data_list:
+                    counter = 0
+                    for objsInframe in data:
+                        print(f'frame {counter} {objsInframe} \n')
+                        objCounter = 0
+                        for obj in objsInframe:
+                            obj["valveTime"] = obj["valveTime"] - 0.02
+                            print(f'obj{objCounter} {obj} \n')
+                            if obj["valveTime"] < 0.0:
+                                obj["valveOpen"] = True
+                            if obj["valveTime"] < - 1.0:
+                                obj["valveClose"] = False
+                                objsInframe.pop(objCounter)
+                                data.pop(objCounter)
+                        objCounter = objCounter + 1
+                    counter = counter + 1
+                print('data len',len(self.data_list))
+                countData = 0
+                for dataEmpty in self.data_list:
+                    if(dataEmpty == []):
+                        self.data_list.pop(countData)
 
+            time.sleep(0.02)  # 20 мс
 
+    def stop(self):
+        self.test = False
 
-def run_in_thread():
-    while True:
-        print("Сообщение из потока")
-        time.sleep(0.02)  # Пауза 20 мс (0.02 сек)
+    def process_list(self, data):
+        self.data_list_recive.clear()
+        self.data_list_recive = data.copy()
+        self.data_list.append(self.data_list_recive)
 
+def stop_and_close_thred():
+    thread.stop()
+    thread.wait()
+    thread.deleteLater()
+    print('Closing Thread')
 
-def cyclt_frame():
-    print("!!!!!!!!!!!!Cyclt Frame!!!!!!!!!!!!",time.time())
 
 def time_valve(hikcam_link1,objs_cnn_data1):
     #print(hikcam_link1.ResultingFrame)
@@ -61,6 +100,7 @@ def time_valve(hikcam_link1,objs_cnn_data1):
             "selectValve":selectValveRound
         }
         objByTike.append(obj_data)
+
     #print(objByTike)
     #print('end')
     return objByTike
@@ -70,9 +110,11 @@ def update_frame(hikcam_link,cnnyolo_link,lable_link,objByTikeFrame_link):
     lable_detection,objs_cnn_data = cnnyolo_link.object_detection(lable_frame)
     lable_link.setPixmap(lable_detection)
     objByTikeFrame = []
+    objByTikeFrame.clear()
     objByTikeFrame = time_valve(hikcam_link,objs_cnn_data).copy()
     if len(objByTikeFrame) > 0:
         objByTikeFrame_link.append(objByTikeFrame)
+        thread.receive_list_signal.emit(objByTikeFrame_link.copy())
         #print('objValveArray',objByTikeFrame_link)
         #print('sizeOfobjValveArray',len(objByTikeFrame_link))
 
@@ -218,15 +260,11 @@ if __name__ == "__main__":
     timer.setInterval(100)
     timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.CameraLabel,objByTikeFrame))
 
-    #Timer for frame
-    timerFrame = QTimer()
-    timerFrame.setInterval(500)
-    timerFrame.timeout.connect(cyclt_frame)
-
+    #Thread valve
+    thread = WorkerThread()
 
 
     #Cоеднение ui кнопок камеры
-
     ui.pushButtonsearchCam.clicked.connect(lambda:hikCamera1.update_cam_list())
     ui.pushButtonConnectCam.clicked.connect(lambda:hikCamera1.create_cam_handle_open_setting_start_grab())
     ui.pushButtonDisconectCam.clicked.connect(lambda: hikCamera1.close_grab_destroy_handle())
@@ -291,8 +329,8 @@ if __name__ == "__main__":
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:timer.start())
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:timer.stop())
 
-    ui.pushButtonStartObjDetectCnn.clicked.connect(lambda: timerFrame.start())
-    ui.pushButtonStopObjDetectCnn.clicked.connect(lambda: timerFrame.stop())
+    ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:thread.start())
+    ui.pushButtonStopObjDetectCnn.clicked.connect(lambda:thread.stop())
 
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:cnn_status_button_ui(ui))
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda: cnn_status_button_ui(ui))
@@ -307,13 +345,6 @@ if __name__ == "__main__":
     ui.tabWidget.setCurrentWidget(ui.mainTab)
     logger.info("App started")
 
-    #Thread valve
-    thread = QThread.create(run_in_thread)
-
-
-
-
-
-    app.aboutToQuit.connect(thread.quit)
+    app.aboutToQuit.connect(stop_and_close_thred)
 
     sys.exit(app.exec())

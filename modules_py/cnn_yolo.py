@@ -42,6 +42,7 @@ class CnnYolo():
                 # Извлечение координат, confidence scores и классов
                 for box in boxes:
                     obj_data = {}
+                    obj_data.clear()
                     x1, y1, x2, y2 = box.xyxy[0].tolist()
                     x_center, y_center, width, height = box.xywh[0].tolist()
                     confidence = box.conf[0].item()
