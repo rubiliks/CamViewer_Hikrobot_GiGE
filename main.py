@@ -26,9 +26,9 @@ class WorkerThread(QThread):
         self.test = False
         self.data_list_recive = []
         self.data_list = []
-        self.bool_list = [True] * 16
-
+        self.bool_list = [False] * 80
         self.receive_list_signal.connect(self.process_list)
+
     def run(self):
         self.test = True
         client = ModbusTcpClient(
@@ -38,14 +38,6 @@ class WorkerThread(QThread):
             retries=3  # Количество попыток переподключения
         )
         print('client',client)
-
-        result_read = client.read_discrete_inputs(
-            address=0,  # Начальный адрес
-            count=8,  # Количество битов (8 bits)
-            device_id=1  # ID устройства
-        )
-        print(result_read)
-
         resule_write_coils = client.write_coils(4096,self.bool_list)
         print(resule_write_coils)
 
@@ -57,7 +49,6 @@ class WorkerThread(QThread):
                 for obj in objsInframe:
                     print(f'obj {obj} \n')
                     obj["valveTime"] = obj["valveTime"] - 0.02
-                    # print(f'obj{objCounter} {obj} \n')yfpfl
                     if obj["valveTime"] < 0.0:
                         obj["valveOpen"] = True
                     if obj["valveTime"] < - 1.0:
@@ -66,13 +57,30 @@ class WorkerThread(QThread):
                 objCounter = objCounter + 1
                 if objsInframe == []:
                     self.data_list.pop()
+
+            for objsInframe in self.data_list:
+                for obj in objsInframe:
+                    print(obj)
+                    if "valveOpen" in obj:
+                        if obj["valveOpen"] == True:
+                            print("Open valve", obj)
+                            self.bool_list[obj["selectValve"]] = True
+                        else:
+                            print("Close valve", obj)
+                            self.bool_list[obj["selectValve"]] = False
+
+            resule_write_coils = client.write_coils(4096, self.bool_list)
+            counterValve = 0
+            for valve in self.bool_list:
+                print('valve', counterValve, valve)
+                counterValve = counterValve + 1
+
             time.sleep(0.02)  # 20 мс
 
     def stop(self):
         self.test = False
 
     def process_list(self, data):
-        print("!!!!!!!!!!!!!!!!!!!!!!!!")
         self.data_list_recive.clear()
         self.data_list_recive = data.copy()
         self.data_list.append(self.data_list_recive)
