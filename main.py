@@ -38,52 +38,50 @@ class WorkerThread(QThread):
             retries=3  # Количество попыток переподключения
         )
         print('client',client)
-        resule_write_coils = client.write_coils(4096,self.bool_list)
-        print(resule_write_coils)
 
         while self.test:
             print(f'data {self.data_list}  \n')
             for objsInframe in self.data_list:
                 # print(f'frame {counter} {objsInframe} \n')
+                for obj in objsInframe:
+                    #print(f'obj {obj} \n')
+                    obj["valveTime"] = obj["valveTime"] - 0.02
+                    if obj["valveTime"] < 0.0 and obj["valveTime"] > -0.3:
+                        obj["valveOpen"] = True
+                    if obj["valveTime"] < - 0.3:
+                        obj["valveOpen"] = False
+
+            self.bool_list = [False] * 80
+
+            #free valve false in obj
+            for objsInframe in self.data_list:
                 objCounter = 0
                 for obj in objsInframe:
-                    print(f'obj {obj} \n')
-                    obj["valveTime"] = obj["valveTime"] - 0.02
-                    if obj["valveTime"] < 0.0:
-                        obj["valveOpen"] = True
-                    if obj["valveTime"] < - 1.0:
-                        obj["valveClose"] = False
-                        objsInframe.pop(objCounter)
-                objCounter = objCounter + 1
-                if objsInframe == []:
-                    self.data_list.pop()
-
-            for objsInframe in self.data_list:
-                for obj in objsInframe:
-                    print(obj)
                     if "valveOpen" in obj:
                         if obj["valveOpen"] == True:
-                            print("Open valve", obj)
                             self.bool_list[obj["selectValve"]] = True
                         else:
-                            print("Close valve", obj)
                             self.bool_list[obj["selectValve"]] = False
+                            objsInframe.pop(objCounter)
+                        objCounter = objCounter + 1
+            #free frame
+            frameCounter = 0
+            for objsInframe in self.data_list:
+                if objsInframe == []:
+                    self.data_list.pop(frameCounter)
+            frameCounter = frameCounter + 1
 
             resule_write_coils = client.write_coils(4096, self.bool_list)
-            counterValve = 0
-            for valve in self.bool_list:
-                print('valve', counterValve, valve)
-                counterValve = counterValve + 1
-
             time.sleep(0.02)  # 20 мс
 
     def stop(self):
         self.test = False
 
     def process_list(self, data):
-        self.data_list_recive.clear()
         self.data_list_recive = data.copy()
-        self.data_list.append(self.data_list_recive)
+        datacopy = self.data_list.copy()
+        datacopy.append(self.data_list_recive)
+        self.data_list = datacopy.copy()
 
 def stop_and_close_thred():
     thread.stop()
@@ -98,7 +96,7 @@ def time_valve(hikcam_link1,objs_cnn_data1):
     secInLine = ((1 / hikcam_link1.ResultingFrame) / hikcam_link1.Height)
     #print(secInLine)
     counterInt = 0
-    valvesNumber = 80
+    valvesNumber = 79
     lengthToValvesBlock = 0.8 # metric
     ConveyorSpeed = 2.0 # m/s
     #valveBlockWidth = 2.0 # m
