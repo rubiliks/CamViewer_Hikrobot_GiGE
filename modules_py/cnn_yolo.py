@@ -13,6 +13,8 @@ class CnnYolo():
         self.model = 0
         self.modelEnginePath =''
         self.obj_list =[]
+        self.class_names = {}
+
 
     def create_model(self,modelPath):
         if (len(modelPath) != 0 ):
@@ -20,6 +22,10 @@ class CnnYolo():
                 self.modelEnginePath = modelPath
                 self.model = YOLO(self.modelEnginePath)
                 logger.info("CNN created")
+
+                self.class_names = self.model.names  # 获取类别名称字典 {id: name}
+                print("Class names dictionary:", self.class_names)
+
             except ValueError:
                 logger.error(f"CNN create error {ValueError}")
         else:

@@ -27,9 +27,9 @@ class HikCam(QObject):
         self.BalanceBlue = 1957
         self.ResultingLineRate = 0
         self.ResultingFrame = 0.0
-        self.Width = 4096
+        self.Width = 3136
         self.Height = 1000
-        self.OffsetX = 10
+        self.OffsetX = 250
         self.cam_now_connect = False
         self.cam_find = False
 

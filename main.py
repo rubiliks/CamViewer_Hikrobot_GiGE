@@ -97,8 +97,8 @@ def time_valve(hikcam_link1,objs_cnn_data1):
     #print(secInLine)
     counterInt = 0
     valvesNumber = 79
-    lengthToValvesBlock = 0.8 # metric
-    ConveyorSpeed = 2.0 # m/s
+    lengthToValvesBlock = 1.65 # metric
+    ConveyorSpeed = 2.53 # m/s
     #valveBlockWidth = 2.0 # m
     valvesStep =  valvesNumber/hikcam_link1.Width
     #print(valvesStep)
@@ -106,22 +106,24 @@ def time_valve(hikcam_link1,objs_cnn_data1):
     objByTike = []
     objByTike.clear()
     for obj in objs_cnn_data1:
-        #print(counterInt)
-        counterInt = counterInt + 1
-        #print(obj['timestamp'])
-        #print('y_center',obj['y_center'])
-        #print('x_center',obj['x_center'])
-        deltaTime = obj['y_center'] * secInLine
-        #print('delta time', deltaTime)
-        valveTime = timeToOpen - deltaTime
-        #print('valve time',valveTime)
-        selectValve = obj['x_center'] * valvesStep
-        selectValveRound =  round(selectValve)
-        obj_data = {
-            "valveTime": valveTime,
-            "selectValve":selectValveRound
-        }
-        objByTike.append(obj_data)
+        if(obj["class_name"] != 'Ткань'):
+            print('!@@#@#@#!#@',obj)
+            #print(counterInt)
+            counterInt = counterInt + 1
+            #print(obj['timestamp'])
+            #print('y_center',obj['y_center'])
+            #print('x_center',obj['x_center'])
+            deltaTime = obj['y_center'] * secInLine
+            #print('delta time', deltaTime)
+            valveTime = timeToOpen - deltaTime
+            #print('valve time',valveTime)
+            selectValve = obj['x_center'] * valvesStep
+            selectValveRound =  round(selectValve)
+            obj_data = {
+                "valveTime": valveTime,
+                "selectValve":selectValveRound
+            }
+            objByTike.append(obj_data)
 
     #print(objByTike)
     #print('end')
@@ -134,6 +136,7 @@ def update_frame(hikcam_link,cnnyolo_link,lable_link):
     objByTikeFrame = []
     objByTikeFrame.clear()
     objByTikeFrame = time_valve(hikcam_link,objs_cnn_data).copy()
+    print("!!!!!!!!!!!!!!",objByTikeFrame)
     if len(objByTikeFrame) > 0:
         thread.receive_list_signal.emit(objByTikeFrame.copy())
         print('objValveArray',objByTikeFrame)
