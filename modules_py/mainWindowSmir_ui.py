@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(984, 662)
+        MainWindow.resize(1044, 688)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -89,7 +89,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.AascrollAreaWidgetContents = QWidget()
         self.AascrollAreaWidgetContents.setObjectName(u"AascrollAreaWidgetContents")
-        self.AascrollAreaWidgetContents.setGeometry(QRect(0, 0, 352, 502))
+        self.AascrollAreaWidgetContents.setGeometry(QRect(0, 0, 377, 528))
         self.verticalLayout_14 = QVBoxLayout(self.AascrollAreaWidgetContents)
         self.verticalLayout_14.setObjectName(u"verticalLayout_14")
         self.verticalLayout_4 = QVBoxLayout()
@@ -220,21 +220,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addLayout(self.horizontalLayout_14)
 
-        self.horizontalLayout_15 = QHBoxLayout()
-        self.horizontalLayout_15.setObjectName(u"horizontalLayout_15")
-        self.OffsetYlabel = QLabel(self.AascrollAreaWidgetContents)
-        self.OffsetYlabel.setObjectName(u"OffsetYlabel")
-
-        self.horizontalLayout_15.addWidget(self.OffsetYlabel)
-
-        self.OffsetYspinBox = QSpinBox(self.AascrollAreaWidgetContents)
-        self.OffsetYspinBox.setObjectName(u"OffsetYspinBox")
-
-        self.horizontalLayout_15.addWidget(self.OffsetYspinBox)
-
-
-        self.verticalLayout_4.addLayout(self.horizontalLayout_15)
-
         self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_4.addItem(self.verticalSpacer_2)
@@ -258,7 +243,7 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.AscrollAreaWidgetContents = QWidget()
         self.AscrollAreaWidgetContents.setObjectName(u"AscrollAreaWidgetContents")
-        self.AscrollAreaWidgetContents.setGeometry(QRect(0, 0, 350, 500))
+        self.AscrollAreaWidgetContents.setGeometry(QRect(0, 0, 375, 526))
         self.verticalLayout_16 = QVBoxLayout(self.AscrollAreaWidgetContents)
         self.verticalLayout_16.setObjectName(u"verticalLayout_16")
         self.verticalLayout_17 = QVBoxLayout()
@@ -358,10 +343,96 @@ class Ui_MainWindow(object):
         self.ValvesTab.setObjectName(u"ValvesTab")
         self.verticalLayout_12 = QVBoxLayout(self.ValvesTab)
         self.verticalLayout_12.setObjectName(u"verticalLayout_12")
-        self.verticalLayout_10 = QVBoxLayout()
-        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
+        self.scrollArea_3 = QScrollArea(self.ValvesTab)
+        self.scrollArea_3.setObjectName(u"scrollArea_3")
+        self.scrollArea_3.setWidgetResizable(True)
+        self.scrollAreaWidgetContents = QWidget()
+        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 768, 566))
+        self.horizontalLayout_20 = QHBoxLayout(self.scrollAreaWidgetContents)
+        self.horizontalLayout_20.setObjectName(u"horizontalLayout_20")
+        self.horizontalLayout_19 = QHBoxLayout()
+        self.horizontalLayout_19.setObjectName(u"horizontalLayout_19")
+        self.verticalLayout_29 = QVBoxLayout()
+        self.verticalLayout_29.setObjectName(u"verticalLayout_29")
+        self.horizontalLayout_24 = QHBoxLayout()
+        self.horizontalLayout_24.setObjectName(u"horizontalLayout_24")
+        self.lengthToValvesBlockLabel = QLabel(self.scrollAreaWidgetContents)
+        self.lengthToValvesBlockLabel.setObjectName(u"lengthToValvesBlockLabel")
 
-        self.verticalLayout_12.addLayout(self.verticalLayout_10)
+        self.horizontalLayout_24.addWidget(self.lengthToValvesBlockLabel)
+
+        self.lengthToValvesBlockSpinBox = QSpinBox(self.scrollAreaWidgetContents)
+        self.lengthToValvesBlockSpinBox.setObjectName(u"lengthToValvesBlockSpinBox")
+
+        self.horizontalLayout_24.addWidget(self.lengthToValvesBlockSpinBox)
+
+
+        self.verticalLayout_29.addLayout(self.horizontalLayout_24)
+
+        self.horizontalLayout_23 = QHBoxLayout()
+        self.horizontalLayout_23.setObjectName(u"horizontalLayout_23")
+        self.numbersOfValvesLabel = QLabel(self.scrollAreaWidgetContents)
+        self.numbersOfValvesLabel.setObjectName(u"numbersOfValvesLabel")
+
+        self.horizontalLayout_23.addWidget(self.numbersOfValvesLabel)
+
+        self.numbersOfValvesSpinBox = QSpinBox(self.scrollAreaWidgetContents)
+        self.numbersOfValvesSpinBox.setObjectName(u"numbersOfValvesSpinBox")
+
+        self.horizontalLayout_23.addWidget(self.numbersOfValvesSpinBox)
+
+
+        self.verticalLayout_29.addLayout(self.horizontalLayout_23)
+
+        self.horizontalLayout_25 = QHBoxLayout()
+        self.horizontalLayout_25.setObjectName(u"horizontalLayout_25")
+        self.conveyorSpeedlabel = QLabel(self.scrollAreaWidgetContents)
+        self.conveyorSpeedlabel.setObjectName(u"conveyorSpeedlabel")
+
+        self.horizontalLayout_25.addWidget(self.conveyorSpeedlabel)
+
+        self.conveyorSpeeddoubleSpinBox = QDoubleSpinBox(self.scrollAreaWidgetContents)
+        self.conveyorSpeeddoubleSpinBox.setObjectName(u"conveyorSpeeddoubleSpinBox")
+
+        self.horizontalLayout_25.addWidget(self.conveyorSpeeddoubleSpinBox)
+
+
+        self.verticalLayout_29.addLayout(self.horizontalLayout_25)
+
+        self.horizontalLayout_22 = QHBoxLayout()
+        self.horizontalLayout_22.setObjectName(u"horizontalLayout_22")
+        self.timeOfShotValvelabel = QLabel(self.scrollAreaWidgetContents)
+        self.timeOfShotValvelabel.setObjectName(u"timeOfShotValvelabel")
+
+        self.horizontalLayout_22.addWidget(self.timeOfShotValvelabel)
+
+        self.timeOfShotValvedoubleSpinBox = QDoubleSpinBox(self.scrollAreaWidgetContents)
+        self.timeOfShotValvedoubleSpinBox.setObjectName(u"timeOfShotValvedoubleSpinBox")
+
+        self.horizontalLayout_22.addWidget(self.timeOfShotValvedoubleSpinBox)
+
+
+        self.verticalLayout_29.addLayout(self.horizontalLayout_22)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_29.addItem(self.verticalSpacer)
+
+
+        self.horizontalLayout_19.addLayout(self.verticalLayout_29)
+
+        self.verticalLayout_28 = QVBoxLayout()
+        self.verticalLayout_28.setObjectName(u"verticalLayout_28")
+
+        self.horizontalLayout_19.addLayout(self.verticalLayout_28)
+
+
+        self.horizontalLayout_20.addLayout(self.horizontalLayout_19)
+
+        self.scrollArea_3.setWidget(self.scrollAreaWidgetContents)
+
+        self.verticalLayout_12.addWidget(self.scrollArea_3)
 
         self.tabWidget.addTab(self.ValvesTab, "")
         self.SignalsTab = QWidget()
@@ -390,6 +461,16 @@ class Ui_MainWindow(object):
         self.verticalLayout_13.setObjectName(u"verticalLayout_13")
         self.verticalLayout_11 = QVBoxLayout()
         self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.horizontalLayout_15 = QHBoxLayout()
+        self.horizontalLayout_15.setObjectName(u"horizontalLayout_15")
+
+        self.verticalLayout_11.addLayout(self.horizontalLayout_15)
+
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+
+        self.verticalLayout_11.addLayout(self.horizontalLayout_4)
+
 
         self.verticalLayout_13.addLayout(self.verticalLayout_11)
 
@@ -400,6 +481,89 @@ class Ui_MainWindow(object):
         self.verticalLayout_26.setObjectName(u"verticalLayout_26")
         self.verticalLayout_25 = QVBoxLayout()
         self.verticalLayout_25.setObjectName(u"verticalLayout_25")
+        self.horizontalLayout_16 = QHBoxLayout()
+        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
+        self.verticalLayout_27 = QVBoxLayout()
+        self.verticalLayout_27.setObjectName(u"verticalLayout_27")
+        self.horizontalLayout_17 = QHBoxLayout()
+        self.horizontalLayout_17.setObjectName(u"horizontalLayout_17")
+        self.resultingLineRateLabel = QLabel(self.ControlTab)
+        self.resultingLineRateLabel.setObjectName(u"resultingLineRateLabel")
+
+        self.horizontalLayout_17.addWidget(self.resultingLineRateLabel)
+
+        self.resultingLineRatespinBox = QSpinBox(self.ControlTab)
+        self.resultingLineRatespinBox.setObjectName(u"resultingLineRatespinBox")
+        self.resultingLineRatespinBox.setEnabled(False)
+
+        self.horizontalLayout_17.addWidget(self.resultingLineRatespinBox)
+
+
+        self.verticalLayout_27.addLayout(self.horizontalLayout_17)
+
+        self.horizontalLayout_18 = QHBoxLayout()
+        self.horizontalLayout_18.setObjectName(u"horizontalLayout_18")
+        self.resultingFrameRatelabel = QLabel(self.ControlTab)
+        self.resultingFrameRatelabel.setObjectName(u"resultingFrameRatelabel")
+
+        self.horizontalLayout_18.addWidget(self.resultingFrameRatelabel)
+
+        self.resultingFrameRatedoubleSpinBox = QDoubleSpinBox(self.ControlTab)
+        self.resultingFrameRatedoubleSpinBox.setObjectName(u"resultingFrameRatedoubleSpinBox")
+        self.resultingFrameRatedoubleSpinBox.setEnabled(False)
+
+        self.horizontalLayout_18.addWidget(self.resultingFrameRatedoubleSpinBox)
+
+
+        self.verticalLayout_27.addLayout(self.horizontalLayout_18)
+
+        self.horizontalLayout_26 = QHBoxLayout()
+        self.horizontalLayout_26.setObjectName(u"horizontalLayout_26")
+        self.cycleTimeCycleCnnlabel = QLabel(self.ControlTab)
+        self.cycleTimeCycleCnnlabel.setObjectName(u"cycleTimeCycleCnnlabel")
+
+        self.horizontalLayout_26.addWidget(self.cycleTimeCycleCnnlabel)
+
+        self.cycleTimeCycleCnndoubleSpinBox = QDoubleSpinBox(self.ControlTab)
+        self.cycleTimeCycleCnndoubleSpinBox.setObjectName(u"cycleTimeCycleCnndoubleSpinBox")
+        self.cycleTimeCycleCnndoubleSpinBox.setEnabled(False)
+
+        self.horizontalLayout_26.addWidget(self.cycleTimeCycleCnndoubleSpinBox)
+
+
+        self.verticalLayout_27.addLayout(self.horizontalLayout_26)
+
+        self.horizontalLayout_21 = QHBoxLayout()
+        self.horizontalLayout_21.setObjectName(u"horizontalLayout_21")
+        self.cycleTimeCycleValve = QLabel(self.ControlTab)
+        self.cycleTimeCycleValve.setObjectName(u"cycleTimeCycleValve")
+
+        self.horizontalLayout_21.addWidget(self.cycleTimeCycleValve)
+
+        self.cycleTimeCycleValvedoubleSpinBox = QDoubleSpinBox(self.ControlTab)
+        self.cycleTimeCycleValvedoubleSpinBox.setObjectName(u"cycleTimeCycleValvedoubleSpinBox")
+        self.cycleTimeCycleValvedoubleSpinBox.setEnabled(False)
+
+        self.horizontalLayout_21.addWidget(self.cycleTimeCycleValvedoubleSpinBox)
+
+
+        self.verticalLayout_27.addLayout(self.horizontalLayout_21)
+
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_27.addItem(self.verticalSpacer_4)
+
+
+        self.horizontalLayout_16.addLayout(self.verticalLayout_27)
+
+        self.verticalLayout_9 = QVBoxLayout()
+        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
+
+        self.horizontalLayout_16.addLayout(self.verticalLayout_9)
+
+
+        self.verticalLayout_25.addLayout(self.horizontalLayout_16)
+
 
         self.verticalLayout_26.addLayout(self.verticalLayout_25)
 
@@ -421,6 +585,11 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_6)
+
+        self.valve_widget = QWidget(self.videoWidget)
+        self.valve_widget.setObjectName(u"valve_widget")
+
+        self.verticalLayout.addWidget(self.valve_widget)
 
 
         self.gridLayout_2.addWidget(self.videoWidget, 0, 0, 1, 1)
@@ -540,9 +709,9 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addLayout(self.verticalLayout_24)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.verticalLayout_2.addItem(self.verticalSpacer)
+        self.verticalLayout_2.addItem(self.verticalSpacer_5)
 
 
         self.gridLayout_2.addWidget(self.groupBoxButton, 0, 1, 2, 1)
@@ -551,7 +720,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -571,7 +740,6 @@ class Ui_MainWindow(object):
         self.Widthlabel.setText(QCoreApplication.translate("MainWindow", u"Width", None))
         self.Heightlabel.setText(QCoreApplication.translate("MainWindow", u"Height", None))
         self.OffsetXlabel.setText(QCoreApplication.translate("MainWindow", u"Offset X", None))
-        self.OffsetYlabel.setText(QCoreApplication.translate("MainWindow", u"Offset Y", None))
         self.cnnSettinglabel.setText(QCoreApplication.translate("MainWindow", u"CNN Setting", None))
         self.Cnn_path_lable.setText(QCoreApplication.translate("MainWindow", u"CNN Path:", None))
         self.cnnPathQlineEdit.setText(QCoreApplication.translate("MainWindow", u"./resources/EMG_2025_24_06_v1.engine", None))
@@ -579,10 +747,18 @@ class Ui_MainWindow(object):
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Modbus IP ", None))
         self.settingPathlabel.setText(QCoreApplication.translate("MainWindow", u"Setting path:", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.SettingTab), QCoreApplication.translate("MainWindow", u"Settings", None))
+        self.lengthToValvesBlockLabel.setText(QCoreApplication.translate("MainWindow", u"Length to valves block", None))
+        self.numbersOfValvesLabel.setText(QCoreApplication.translate("MainWindow", u"Numbers of valves", None))
+        self.conveyorSpeedlabel.setText(QCoreApplication.translate("MainWindow", u"Conveyor speed", None))
+        self.timeOfShotValvelabel.setText(QCoreApplication.translate("MainWindow", u"Time of shot valve", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ValvesTab), QCoreApplication.translate("MainWindow", u"Valves", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.SignalsTab), QCoreApplication.translate("MainWindow", u"Signals", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.StatisticTab), QCoreApplication.translate("MainWindow", u"Statistic", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.AlarsTab), QCoreApplication.translate("MainWindow", u"Alarms", None))
+        self.resultingLineRateLabel.setText(QCoreApplication.translate("MainWindow", u"Resulting Line Rate(Hz)", None))
+        self.resultingFrameRatelabel.setText(QCoreApplication.translate("MainWindow", u"Resulting Frame Rate(Fps)", None))
+        self.cycleTimeCycleCnnlabel.setText(QCoreApplication.translate("MainWindow", u"Cycle time cycle CNN", None))
+        self.cycleTimeCycleValve.setText(QCoreApplication.translate("MainWindow", u"Cycle time cycle valve", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ControlTab), QCoreApplication.translate("MainWindow", u"Control", None))
         self.statusBarLable.setText(QCoreApplication.translate("MainWindow", u"Status bar", None))
         self.groupBoxButton.setTitle(QCoreApplication.translate("MainWindow", u"Control board", None))
