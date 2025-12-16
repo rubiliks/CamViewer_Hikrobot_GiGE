@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1044, 688)
+        MainWindow.resize(1044, 704)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -89,7 +89,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.AascrollAreaWidgetContents = QWidget()
         self.AascrollAreaWidgetContents.setObjectName(u"AascrollAreaWidgetContents")
-        self.AascrollAreaWidgetContents.setGeometry(QRect(0, 0, 377, 528))
+        self.AascrollAreaWidgetContents.setGeometry(QRect(0, 0, 377, 502))
         self.verticalLayout_14 = QVBoxLayout(self.AascrollAreaWidgetContents)
         self.verticalLayout_14.setObjectName(u"verticalLayout_14")
         self.verticalLayout_4 = QVBoxLayout()
@@ -220,6 +220,27 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addLayout(self.horizontalLayout_14)
 
+        self.horizontalLayout_27 = QHBoxLayout()
+        self.horizontalLayout_27.setObjectName(u"horizontalLayout_27")
+        self.reverseXlabel = QLabel(self.AascrollAreaWidgetContents)
+        self.reverseXlabel.setObjectName(u"reverseXlabel")
+
+        self.horizontalLayout_27.addWidget(self.reverseXlabel)
+
+        self.reverseXcheckBox = QCheckBox(self.AascrollAreaWidgetContents)
+        self.reverseXcheckBox.setObjectName(u"reverseXcheckBox")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.reverseXcheckBox.sizePolicy().hasHeightForWidth())
+        self.reverseXcheckBox.setSizePolicy(sizePolicy2)
+        self.reverseXcheckBox.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+
+        self.horizontalLayout_27.addWidget(self.reverseXcheckBox)
+
+
+        self.verticalLayout_4.addLayout(self.horizontalLayout_27)
+
         self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_4.addItem(self.verticalSpacer_2)
@@ -243,7 +264,7 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.AscrollAreaWidgetContents = QWidget()
         self.AscrollAreaWidgetContents.setObjectName(u"AscrollAreaWidgetContents")
-        self.AscrollAreaWidgetContents.setGeometry(QRect(0, 0, 375, 526))
+        self.AscrollAreaWidgetContents.setGeometry(QRect(0, 0, 375, 500))
         self.verticalLayout_16 = QVBoxLayout(self.AscrollAreaWidgetContents)
         self.verticalLayout_16.setObjectName(u"verticalLayout_16")
         self.verticalLayout_17 = QVBoxLayout()
@@ -268,11 +289,11 @@ class Ui_MainWindow(object):
         self.cnnPathQlineEdit = QLineEdit(self.AscrollAreaWidgetContents)
         self.cnnPathQlineEdit.setObjectName(u"cnnPathQlineEdit")
         self.cnnPathQlineEdit.setEnabled(True)
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.cnnPathQlineEdit.sizePolicy().hasHeightForWidth())
-        self.cnnPathQlineEdit.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.cnnPathQlineEdit.sizePolicy().hasHeightForWidth())
+        self.cnnPathQlineEdit.setSizePolicy(sizePolicy3)
 
         self.horizontalLayout_5.addWidget(self.cnnPathQlineEdit)
 
@@ -348,7 +369,7 @@ class Ui_MainWindow(object):
         self.scrollArea_3.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 768, 566))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 768, 540))
         self.horizontalLayout_20 = QHBoxLayout(self.scrollAreaWidgetContents)
         self.horizontalLayout_20.setObjectName(u"horizontalLayout_20")
         self.horizontalLayout_19 = QHBoxLayout()
@@ -588,6 +609,18 @@ class Ui_MainWindow(object):
 
         self.valve_widget = QWidget(self.videoWidget)
         self.valve_widget.setObjectName(u"valve_widget")
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.valve_widget.sizePolicy().hasHeightForWidth())
+        self.valve_widget.setSizePolicy(sizePolicy4)
+        self.verticalLayout_10 = QVBoxLayout(self.valve_widget)
+        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
+        self.valveImagelabel = QLabel(self.valve_widget)
+        self.valveImagelabel.setObjectName(u"valveImagelabel")
+
+        self.verticalLayout_10.addWidget(self.valveImagelabel)
+
 
         self.verticalLayout.addWidget(self.valve_widget)
 
@@ -720,7 +753,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -740,6 +773,8 @@ class Ui_MainWindow(object):
         self.Widthlabel.setText(QCoreApplication.translate("MainWindow", u"Width", None))
         self.Heightlabel.setText(QCoreApplication.translate("MainWindow", u"Height", None))
         self.OffsetXlabel.setText(QCoreApplication.translate("MainWindow", u"Offset X", None))
+        self.reverseXlabel.setText(QCoreApplication.translate("MainWindow", u"ReverseX", None))
+        self.reverseXcheckBox.setText("")
         self.cnnSettinglabel.setText(QCoreApplication.translate("MainWindow", u"CNN Setting", None))
         self.Cnn_path_lable.setText(QCoreApplication.translate("MainWindow", u"CNN Path:", None))
         self.cnnPathQlineEdit.setText(QCoreApplication.translate("MainWindow", u"./resources/EMG_2025_24_06_v1.engine", None))
@@ -761,6 +796,7 @@ class Ui_MainWindow(object):
         self.cycleTimeCycleValve.setText(QCoreApplication.translate("MainWindow", u"Cycle time cycle valve", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ControlTab), QCoreApplication.translate("MainWindow", u"Control", None))
         self.statusBarLable.setText(QCoreApplication.translate("MainWindow", u"Status bar", None))
+        self.valveImagelabel.setText(QCoreApplication.translate("MainWindow", u"ValveImage", None))
         self.groupBoxButton.setTitle(QCoreApplication.translate("MainWindow", u"Control board", None))
         self.remoteControlCheckBox.setText(QCoreApplication.translate("MainWindow", u"Remote control", None))
         self.camFindLabel.setText(QCoreApplication.translate("MainWindow", u"No find cam", None))
