@@ -1,5 +1,7 @@
 import cv2
-from PySide6.QtWidgets import QApplication, QMainWindow
+import numpy as np
+from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QCheckBox, QTableWidget, QLabel
 from PySide6.QtCore import QTimer, Signal, Slot
 from PySide6.QtCore import QThread
 from polars import self_dtype
@@ -21,6 +23,8 @@ logger = logging.getLogger(__name__)
 # В PySide6 обязательно нужно наследоваться от QThread для переопределения run()
 class WorkerThread(QThread):
     receive_list_signal = Signal(list)
+    update_bool_list_signal = Signal(list)
+
     def __init__(self):
         super().__init__()
         self.test = False
@@ -40,15 +44,15 @@ class WorkerThread(QThread):
         print('client',client)
 
         while self.test:
-            print(f'data {self.data_list}  \n')
+            #print(f'data {self.data_list}  \n')
             for objsInframe in self.data_list:
                 # print(f'frame {counter} {objsInframe} \n')
                 for obj in objsInframe:
                     #print(f'obj {obj} \n')
                     obj["valveTime"] = obj["valveTime"] - 0.02
-                    if obj["valveTime"] < 0.0 and obj["valveTime"] > -0.3:
+                    if obj["valveTime"] < 0.0 and obj["valveTime"] > - 0.3:
                         obj["valveOpen"] = True
-                    if obj["valveTime"] < - 0.3:
+                    if obj["valveTime"] < - 0.1:
                         obj["valveOpen"] = False
 
             self.bool_list = [False] * 80
@@ -71,7 +75,8 @@ class WorkerThread(QThread):
                     self.data_list.pop(frameCounter)
             frameCounter = frameCounter + 1
 
-            resule_write_coils = client.write_coils(4096, self.bool_list)
+            resule_write_coils = client.write_coils(4112, self.bool_list)
+            self.update_bool_list_signal.emit(self.bool_list.copy())
             time.sleep(0.02)  # 20 мс
 
     def stop(self):
@@ -97,7 +102,7 @@ def time_valve(hikcam_link1,objs_cnn_data1):
     #print(secInLine)
     counterInt = 0
     valvesNumber = 79
-    lengthToValvesBlock = 1.65 # metric
+    lengthToValvesBlock = 1.2 # metric
     ConveyorSpeed = 2.53 # m/s
     #valveBlockWidth = 2.0 # m
     valvesStep =  valvesNumber/hikcam_link1.Width
@@ -107,13 +112,16 @@ def time_valve(hikcam_link1,objs_cnn_data1):
     objByTike.clear()
     for obj in objs_cnn_data1:
         if(obj["class_name"] != 'Ткань'):
-            print('!@@#@#@#!#@',obj)
+            #print('!@@#@#@#!#@',obj)
             #print(counterInt)
             counterInt = counterInt + 1
             #print(obj['timestamp'])
             #print('y_center',obj['y_center'])
             #print('x_center',obj['x_center'])
-            deltaTime = obj['y_center'] * secInLine
+
+            inverted_line = 1001 - obj['y_center']  # 1→1000, 1000→1, 500→501, etc.
+            deltaTime = inverted_line * secInLine
+            #deltaTime = obj['y_center'] * secInLine
             #print('delta time', deltaTime)
             valveTime = timeToOpen - deltaTime
             #print('valve time',valveTime)
@@ -136,12 +144,33 @@ def update_frame(hikcam_link,cnnyolo_link,lable_link):
     objByTikeFrame = []
     objByTikeFrame.clear()
     objByTikeFrame = time_valve(hikcam_link,objs_cnn_data).copy()
-    print("!!!!!!!!!!!!!!",objByTikeFrame)
     if len(objByTikeFrame) > 0:
         thread.receive_list_signal.emit(objByTikeFrame.copy())
-        print('objValveArray',objByTikeFrame)
+        #print('objValveArray',objByTikeFrame)
         #print('sizeOfobjValveArray',len(objByTikeFrame_link))
     #print('frame',hikcam_link.ResultingFrame)
+
+def update_ui_bool_display(data, ui_reference=None):
+    imageValve = np.zeros((30, 1600, 3), dtype=np.uint8)
+    stepValveImage = 1600/80
+    for i in range(80):
+        centrl = round(10+i*stepValveImage)
+        centrY = 20
+        colorValve = (0, 0, 0)
+        if data[i] == True:
+            colorValve = (0, 255, 0)
+        else:
+            colorValve = (255, 0, 0)
+        cv2.circle(imageValve, (centrl, 15), 2, colorValve, 2)
+    heightImgDispla, widthImgDispla, channelsImgDispla = imageValve.shape
+    bytes_per_lineImgDispla = channelsImgDispla * widthImgDispla
+    q_image = QImage(imageValve.data, widthImgDispla, heightImgDispla, bytes_per_lineImgDispla, QImage.Format_RGB888)
+    q_pixmap = QPixmap.fromImage(q_image)
+    q_pixmap2 = q_pixmap.copy()
+    ui.valveImagelabel.setPixmap(q_pixmap2)
+
+
+
 
 
 def cam_status_block_button_ui(ui_link):
@@ -202,6 +231,11 @@ def cam_status_block_button_ui(ui_link):
         ui_link.WidthspinBox.setEnabled(False)
     else:
         ui_link.WidthspinBox.setEnabled(True)
+
+    if ui_link.reverseXcheckBox.isEnabled():
+        ui_link.reverseXcheckBox.setEnabled(False)
+    else:
+        ui_link.reverseXcheckBox.setEnabled(True)
 
 def cnn_status_button_ui(ui_link):
     if ui_link.pushButtonStopObjDetectCnn.isEnabled():
@@ -282,8 +316,11 @@ if __name__ == "__main__":
     timer.setInterval(100)
     timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.CameraLabel))
 
+
+
     #Thread valve
     thread = WorkerThread()
+    thread.update_bool_list_signal.connect(lambda data: update_ui_bool_display(data, ui))
 
 
     #Cоеднение ui кнопок камеры
@@ -357,6 +394,11 @@ if __name__ == "__main__":
     ui.pushButtonStartObjDetectCnn.clicked.connect(lambda:cnn_status_button_ui(ui))
     ui.pushButtonStopObjDetectCnn.clicked.connect(lambda: cnn_status_button_ui(ui))
     #ui.ApplyCNNpushButton.clicked.connect(lambda:cnn_apply_cnn_path(cnn1,setting1.cnnPath))
+
+    ui.reverseXcheckBox.setChecked(setting1.cameraSettingReverseX)
+    hikCamera1.set_ReverseX(setting1.cameraSettingReverseX)
+    ui.reverseXcheckBox.clicked.connect(hikCamera1.set_ReverseX)
+
 
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)

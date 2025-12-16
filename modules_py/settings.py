@@ -15,8 +15,10 @@ class Setting():
         self.cameraSettingWidth = 4096
         self.cameraSettingHeight = 1000
         self.cameraSettingOffsetX = 100
+        self.cameraSettingReverseX = False
         self.confige = ''
         self.cnnPath = ''
+
 
     def set_setting_path(self,SettingPath):
         p = Path(SettingPath)
@@ -38,6 +40,7 @@ class Setting():
             self.cameraSettingHeight = config['cameraSetting']['Height']
             self.cameraSettingOffsetX = config['cameraSetting']['OffsetX']
             self.cnnPath = config['CnnSetting']['cnnPath']
+            self.cameraSettingReverseX = config['cameraSetting']['ReverseX']
 
     def write_setting_gain(self, gain_link):
         self.confige['cameraSetting']['gain'] = gain_link

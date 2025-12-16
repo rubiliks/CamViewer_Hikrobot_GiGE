@@ -30,6 +30,7 @@ class HikCam(QObject):
         self.Width = 3136
         self.Height = 1000
         self.OffsetX = 250
+        self.ReverseX = False
         self.cam_now_connect = False
         self.cam_find = False
 
@@ -239,6 +240,14 @@ class HikCam(QObject):
         else:
             logger.info(f"set OffsetX {self.OffsetX}")
 
+        #Set ReverseX
+        ret = self.cam.MV_CC_SetBoolValue("ReverseX",self.ReverseX)
+        if ret != 0:
+            logger.error("set ReverseX fail! ret[0x%x]" % ret)
+            sys.exit()
+        else:
+            logger.info(f"set ReverseX {self.ReverseX}")
+
         #Get cam Resulting Frame Rate(Fps)
         stFloatValue = MVCC_FLOATVALUE()
         memset(byref(stFloatValue), 0, sizeof(MVCC_FLOATVALUE))
@@ -351,6 +360,9 @@ class HikCam(QObject):
 
     def set_OffsetX(self,value):
         self.OffsetX = value
+
+    def set_ReverseX(self,value):
+        self.ReverseX = value
 
 
 
