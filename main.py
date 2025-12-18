@@ -47,12 +47,14 @@ class WorkerThread(QThread):
             #print(f'data {self.data_list}  \n')
             for objsInframe in self.data_list:
                 # print(f'frame {counter} {objsInframe} \n')
+
                 for obj in objsInframe:
-                    #print(f'obj {obj} \n')
+                    print(obj)
+                    print(f'obj {obj} \n')
                     obj["valveTime"] = obj["valveTime"] - 0.02
-                    if obj["valveTime"] < 0.0 and obj["valveTime"] > - 0.3:
+                    if obj["valveTime"] < 0.0 and obj["valveTime"] > obj["valveTimeOpen"]:
                         obj["valveOpen"] = True
-                    if obj["valveTime"] < - 0.1:
+                    if obj["valveTime"] < obj["valveTimeOpen"]:
                         obj["valveOpen"] = False
 
             self.bool_list = [False] * 80
@@ -95,19 +97,16 @@ def stop_and_close_thred():
     print('Closing Thread')
 
 
-def time_valve(hikcam_link1,objs_cnn_data1):
+def time_valve(hikcam_link1,objs_cnn_data1,setting1):
     #print(hikcam_link1.ResultingFrame)
     #print(hikcam_link1.ResultingLineRate)
+
     secInLine = ((1 / hikcam_link1.ResultingFrame) / hikcam_link1.Height)
     #print(secInLine)
     counterInt = 0
-    valvesNumber = 79
-    lengthToValvesBlock = 1.2 # metric
-    ConveyorSpeed = 2.53 # m/s
-    #valveBlockWidth = 2.0 # m
-    valvesStep =  valvesNumber/hikcam_link1.Width
+    valvesStep =  setting1.valvesNumber/hikcam_link1.Width
     #print(valvesStep)
-    timeToOpen = lengthToValvesBlock/ConveyorSpeed
+    timeToOpen = setting1.valvesLengthToBlock/setting1.valvesConveyorSpeed
     objByTike = []
     objByTike.clear()
     for obj in objs_cnn_data1:
@@ -116,47 +115,46 @@ def time_valve(hikcam_link1,objs_cnn_data1):
             #print(counterInt)
             counterInt = counterInt + 1
             #print(obj['timestamp'])
-            #print('y_center',obj['y_center'])
+            print('y_center',obj['y_center'])
             #print('x_center',obj['x_center'])
-
-            inverted_line = 1001 - obj['y_center']  # 1→1000, 1000→1, 500→501, etc.
+            inverted_line = setting1.cameraSettingHeight - obj['y_center']  # 1→1000, 1000→1, 500→501, etc.
+            print('inverted_line', inverted_line)
             deltaTime = inverted_line * secInLine
             #deltaTime = obj['y_center'] * secInLine
-            #print('delta time', deltaTime)
+            print('delta time', deltaTime)
             valveTime = timeToOpen - deltaTime
             #print('valve time',valveTime)
             selectValve = obj['x_center'] * valvesStep
             selectValveRound =  round(selectValve)
+            valvesTimeOpen = setting1.valvesTimeOpen *(-1.0)
             obj_data = {
                 "valveTime": valveTime,
-                "selectValve":selectValveRound
+                "selectValve":selectValveRound,
+                "valveTimeOpen":valvesTimeOpen
             }
             objByTike.append(obj_data)
-
     #print(objByTike)
     #print('end')
     return objByTike
 
-def update_frame(hikcam_link,cnnyolo_link,lable_link):
+def update_frame(hikcam_link,cnnyolo_link,lable_link,setting_link):
     lable_frame = hikcam_link.get_one_frame()
     lable_detection,objs_cnn_data = cnnyolo_link.object_detection(lable_frame)
     lable_link.setPixmap(lable_detection)
     objByTikeFrame = []
     objByTikeFrame.clear()
-    objByTikeFrame = time_valve(hikcam_link,objs_cnn_data).copy()
+    objByTikeFrame = time_valve(hikcam_link,objs_cnn_data,setting_link).copy()
     if len(objByTikeFrame) > 0:
         thread.receive_list_signal.emit(objByTikeFrame.copy())
         #print('objValveArray',objByTikeFrame)
         #print('sizeOfobjValveArray',len(objByTikeFrame_link))
     #print('frame',hikcam_link.ResultingFrame)
 
-def update_ui_bool_display(data, ui_reference=None):
+def update_ui_bool_display(data, ui_reference=None,setting_link=None):
     imageValve = np.zeros((30, 1600, 3), dtype=np.uint8)
-    stepValveImage = 1600/80
-    for i in range(80):
+    stepValveImage = 1600/setting_link.valvesNumber
+    for i in range(setting_link.valvesNumber):
         centrl = round(10+i*stepValveImage)
-        centrY = 20
-        colorValve = (0, 0, 0)
         if data[i] == True:
             colorValve = (0, 255, 0)
         else:
@@ -168,9 +166,6 @@ def update_ui_bool_display(data, ui_reference=None):
     q_pixmap = QPixmap.fromImage(q_image)
     q_pixmap2 = q_pixmap.copy()
     ui.valveImagelabel.setPixmap(q_pixmap2)
-
-
-
 
 
 def cam_status_block_button_ui(ui_link):
@@ -314,14 +309,11 @@ if __name__ == "__main__":
     #Экземпляр таймера для получения кадра с камеры
     timer = QTimer()
     timer.setInterval(100)
-    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.CameraLabel))
-
-
+    timer.timeout.connect(lambda: update_frame(hikCamera1, cnn1, ui.CameraLabel,setting1))
 
     #Thread valve
     thread = WorkerThread()
-    thread.update_bool_list_signal.connect(lambda data: update_ui_bool_display(data, ui))
-
+    thread.update_bool_list_signal.connect(lambda data: update_ui_bool_display(data, ui, setting1))
 
     #Cоеднение ui кнопок камеры
     ui.pushButtonsearchCam.clicked.connect(lambda:hikCamera1.update_cam_list())
@@ -398,7 +390,6 @@ if __name__ == "__main__":
     ui.reverseXcheckBox.setChecked(setting1.cameraSettingReverseX)
     hikCamera1.set_ReverseX(setting1.cameraSettingReverseX)
     ui.reverseXcheckBox.clicked.connect(hikCamera1.set_ReverseX)
-
 
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)

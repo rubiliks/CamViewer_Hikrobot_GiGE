@@ -18,7 +18,11 @@ class Setting():
         self.cameraSettingReverseX = False
         self.confige = ''
         self.cnnPath = ''
-
+        self.valvesNumber = 80
+        self.valvesLengthToBlock = 1.2
+        self.valvesConveyorSpeed = 2.53
+        self.valvesValveStep = 1
+        self.valvesTimeOpen = 0.25
 
     def set_setting_path(self,SettingPath):
         p = Path(SettingPath)
@@ -44,44 +48,41 @@ class Setting():
 
     def write_setting_gain(self, gain_link):
         self.confige['cameraSetting']['gain'] = gain_link
-        with open(self.jsonSettingPath, "w") as file:
-            json.dump(self.confige, file)
+        with open(self.jsonSettingPath, "w",encoding='utf-8') as file:
+            json.dump(self.confige, file,ensure_ascii=False, indent=4)
 
     def write_setting_exposure(self, exposure_link):
         self.confige['cameraSetting']['exposureTime'] = exposure_link
-        with open(self.jsonSettingPath, "w") as file:
-            json.dump(self.confige, file)
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
 
     def write_setting_BalanceRed(self, BalanceRed_link):
         self.confige['cameraSetting']['BalanceRed'] = BalanceRed_link
-        with open(self.jsonSettingPath, "w") as file:
-            json.dump(self.confige, file)
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
 
     def write_setting_BalanceGreen(self, BalanceGreen_link):
         self.confige['cameraSetting']['BalanceGreen'] = BalanceGreen_link
-        with open(self.jsonSettingPath, "w") as file:
-            json.dump(self.confige, file)
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
 
     def write_setting_BalanceBlue(self, BalanceBlue_link):
         self.confige['cameraSetting']['BalanceBlue'] = BalanceBlue_link
-        with open(self.jsonSettingPath, "w") as file:
-            json.dump(self.confige, file)
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
 
     def write_setting_Width(self, Width_link):
         self.confige['cameraSetting']['Width'] = Width_link
-        with open(self.jsonSettingPath, "w") as file:
-            json.dump(self.confige, file)
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
 
     def write_setting_Height(self, Height_link):
         self.confige['cameraSetting']['Height'] = Height_link
-        with open(self.jsonSettingPath, "w") as file:
-            json.dump(self.confige, file)
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
 
     def write_setting_OffsetX(self, OffsetX_link):
         self.confige['cameraSetting']['OffsetX'] = OffsetX_link
-        with open(self.jsonSettingPath, "w") as file:
-            json.dump(self.confige, file)
-
-
-
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
 
