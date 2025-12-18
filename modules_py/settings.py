@@ -21,8 +21,8 @@ class Setting():
         self.valvesNumber = 80
         self.valvesLengthToBlock = 1.2
         self.valvesConveyorSpeed = 2.53
-        self.valvesValveStep = 1
         self.valvesTimeOpen = 0.25
+        self.valveTimeDelta = 0.0
 
     def set_setting_path(self,SettingPath):
         p = Path(SettingPath)
@@ -45,6 +45,8 @@ class Setting():
             self.cameraSettingOffsetX = config['cameraSetting']['OffsetX']
             self.cnnPath = config['CnnSetting']['cnnPath']
             self.cameraSettingReverseX = config['cameraSetting']['ReverseX']
+            self.valveTimeDelta = config['Valve']['valveTimeDelta']
+            self.valvesTimeOpen = config['Valve']['valveTimeToOpen']
 
     def write_setting_gain(self, gain_link):
         self.confige['cameraSetting']['gain'] = gain_link
@@ -86,3 +88,12 @@ class Setting():
         with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
             json.dump(self.confige, file, ensure_ascii=False, indent=4)
 
+    def write_setting_valveTimeDelta(self, valveTimeDelta_link):
+        self.confige['Valve']['valveTimeDelta'] = valveTimeDelta_link
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
+
+    def write_setting_valvesTimeOpen(self, valvesTimeOpen_link):
+        self.confige['Valve']['valveTimeToOpen'] = valvesTimeOpen_link
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)

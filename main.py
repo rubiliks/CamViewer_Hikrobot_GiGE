@@ -31,12 +31,13 @@ class WorkerThread(QThread):
         self.data_list_recive = []
         self.data_list = []
         self.bool_list = [False] * 80
+        self.bool_list_add = [False] * 80
         self.receive_list_signal.connect(self.process_list)
 
     def run(self):
         self.test = True
         client = ModbusTcpClient(
-            host='192.168.88.150',  # IP-адрес устройства
+            host='192.168.6.150',  # IP-адрес устройства
             port=502,  # Стандартный порт Modbus TCP
             timeout=3,  # Таймаут в секундах
             retries=3  # Количество попыток переподключения
@@ -49,15 +50,16 @@ class WorkerThread(QThread):
                 # print(f'frame {counter} {objsInframe} \n')
 
                 for obj in objsInframe:
-                    print(obj)
-                    print(f'obj {obj} \n')
+                    #print(obj)
+                    #print(f'obj {obj} \n')
                     obj["valveTime"] = obj["valveTime"] - 0.02
                     if obj["valveTime"] < 0.0 and obj["valveTime"] > obj["valveTimeOpen"]:
                         obj["valveOpen"] = True
                     if obj["valveTime"] < obj["valveTimeOpen"]:
                         obj["valveOpen"] = False
 
-            self.bool_list = [False] * 80
+            self.bool_list = [False] * setting1.valvesNumber
+            self.bool_list_add = [False] * setting1.valvesNumber
 
             #free valve false in obj
             for objsInframe in self.data_list:
@@ -77,8 +79,16 @@ class WorkerThread(QThread):
                     self.data_list.pop(frameCounter)
             frameCounter = frameCounter + 1
 
-            resule_write_coils = client.write_coils(4112, self.bool_list)
-            self.update_bool_list_signal.emit(self.bool_list.copy())
+            contervale = 0
+            for vale in self.bool_list:
+                if vale == True and contervale > 1 and contervale <79:
+                    self.bool_list_add[contervale] = True
+                    self.bool_list_add[contervale + 1] = True
+                    self.bool_list_add[contervale - 1] = True
+                contervale = contervale + 1
+
+            resule_write_coils = client.write_coils(4112, self.bool_list_add)
+            self.update_bool_list_signal.emit(self.bool_list_add.copy())
             time.sleep(0.02)  # 20 мс
 
     def stop(self):
@@ -115,18 +125,21 @@ def time_valve(hikcam_link1,objs_cnn_data1,setting1):
             #print(counterInt)
             counterInt = counterInt + 1
             #print(obj['timestamp'])
-            print('y_center',obj['y_center'])
+            #print('y_center',obj['y_center'])
             #print('x_center',obj['x_center'])
             inverted_line = setting1.cameraSettingHeight - obj['y_center']  # 1→1000, 1000→1, 500→501, etc.
-            print('inverted_line', inverted_line)
-            deltaTime = inverted_line * secInLine
+            #print('inverted_line', inverted_line)
+            deltaTimeObjPos = inverted_line * secInLine
             #deltaTime = obj['y_center'] * secInLine
-            print('delta time', deltaTime)
-            valveTime = timeToOpen - deltaTime
+            #print('delta time', deltaTime)
+            valveTime = timeToOpen - deltaTimeObjPos + setting1.valveTimeDelta
             #print('valve time',valveTime)
             selectValve = obj['x_center'] * valvesStep
             selectValveRound =  round(selectValve)
             valvesTimeOpen = setting1.valvesTimeOpen *(-1.0)
+            print("valveTime",valveTime)
+            print("valvesTimeOpen",valvesTimeOpen)
+
             obj_data = {
                 "valveTime": valveTime,
                 "selectValve":selectValveRound,
@@ -283,6 +296,13 @@ def change_Height_setting(ui_link,setting_link):
 def change_OffsetX_setting(ui_link,setting_link):
     setting_link.write_setting_OffsetX(ui_link.HeightSpinBox.value())
 
+def change_DeltaTimeToShot_setting(ui_link, setting_link):
+    setting_link.write_setting_valveTimeDelta(ui_link.deltaTimeToShotdoubleSpinBox.value())
+
+
+def change_valveTimeToOpen_setting(ui_link, setting_link):
+    setting_link.write_setting_valvesTimeOpen(ui_link.timeOfShotValvedoubleSpinBox.value())
+
 if __name__ == "__main__":
     logger.info("Start app")
     #Qt создание приложение
@@ -390,6 +410,19 @@ if __name__ == "__main__":
     ui.reverseXcheckBox.setChecked(setting1.cameraSettingReverseX)
     hikCamera1.set_ReverseX(setting1.cameraSettingReverseX)
     ui.reverseXcheckBox.clicked.connect(hikCamera1.set_ReverseX)
+
+    # valve setting
+    ui.deltaTimeToShotdoubleSpinBox.setEnabled(True)
+    ui.deltaTimeToShotdoubleSpinBox.setRange(-1.0,1.0)
+    ui.deltaTimeToShotdoubleSpinBox.setValue(setting1.valveTimeDelta)
+    ui.deltaTimeToShotdoubleSpinBox.valueChanged.connect(lambda:change_DeltaTimeToShot_setting(ui, setting1))
+
+    ui.timeOfShotValvedoubleSpinBox.setValue(True)
+    ui.timeOfShotValvedoubleSpinBox.setRange(0.0,1.0)
+    ui.timeOfShotValvedoubleSpinBox.setValue(setting1.valvesTimeOpen)
+    ui.timeOfShotValvedoubleSpinBox.valueChanged.connect(lambda:change_valveTimeToOpen_setting(ui, setting1))
+
+
 
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)

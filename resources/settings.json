@@ -2,9 +2,9 @@
     "cameraSetting": {
         "gain": 22.0,
         "exposureTime": 201,
-        "BalanceRed": 1200,
+        "BalanceRed": 868,
         "BalanceGreen": 1024,
-        "BalanceBlue": 1957,
+        "BalanceBlue": 1876,
         "Width": 3136,
         "Height": 1000,
         "OffsetX": 250,
@@ -15,5 +15,9 @@
     },
     "AppSetting": {
         "appPathSetting": "resources/settings.json"
+    },
+    "Valve": {
+        "valveTimeDelta": 0.05,
+        "valveTimeToOpen": 0.1
     }
 }

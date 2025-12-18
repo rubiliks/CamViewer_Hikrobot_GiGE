@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1044, 704)
+        MainWindow.resize(984, 704)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -89,7 +89,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.AascrollAreaWidgetContents = QWidget()
         self.AascrollAreaWidgetContents.setObjectName(u"AascrollAreaWidgetContents")
-        self.AascrollAreaWidgetContents.setGeometry(QRect(0, 0, 377, 502))
+        self.AascrollAreaWidgetContents.setGeometry(QRect(0, 0, 352, 502))
         self.verticalLayout_14 = QVBoxLayout(self.AascrollAreaWidgetContents)
         self.verticalLayout_14.setObjectName(u"verticalLayout_14")
         self.verticalLayout_4 = QVBoxLayout()
@@ -264,7 +264,7 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.AscrollAreaWidgetContents = QWidget()
         self.AscrollAreaWidgetContents.setObjectName(u"AscrollAreaWidgetContents")
-        self.AscrollAreaWidgetContents.setGeometry(QRect(0, 0, 375, 500))
+        self.AscrollAreaWidgetContents.setGeometry(QRect(0, 0, 350, 500))
         self.verticalLayout_16 = QVBoxLayout(self.AscrollAreaWidgetContents)
         self.verticalLayout_16.setObjectName(u"verticalLayout_16")
         self.verticalLayout_17 = QVBoxLayout()
@@ -369,7 +369,7 @@ class Ui_MainWindow(object):
         self.scrollArea_3.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 768, 540))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 718, 540))
         self.horizontalLayout_20 = QHBoxLayout(self.scrollAreaWidgetContents)
         self.horizontalLayout_20.setObjectName(u"horizontalLayout_20")
         self.horizontalLayout_19 = QHBoxLayout()
@@ -435,6 +435,21 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout_29.addLayout(self.horizontalLayout_22)
+
+        self.horizontalLayout_28 = QHBoxLayout()
+        self.horizontalLayout_28.setObjectName(u"horizontalLayout_28")
+        self.deltaTimeToShotlabel = QLabel(self.scrollAreaWidgetContents)
+        self.deltaTimeToShotlabel.setObjectName(u"deltaTimeToShotlabel")
+
+        self.horizontalLayout_28.addWidget(self.deltaTimeToShotlabel)
+
+        self.deltaTimeToShotdoubleSpinBox = QDoubleSpinBox(self.scrollAreaWidgetContents)
+        self.deltaTimeToShotdoubleSpinBox.setObjectName(u"deltaTimeToShotdoubleSpinBox")
+
+        self.horizontalLayout_28.addWidget(self.deltaTimeToShotdoubleSpinBox)
+
+
+        self.verticalLayout_29.addLayout(self.horizontalLayout_28)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -569,6 +584,22 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout_27.addLayout(self.horizontalLayout_21)
+
+        self.horizontalLayout_29 = QHBoxLayout()
+        self.horizontalLayout_29.setObjectName(u"horizontalLayout_29")
+        self.label_4 = QLabel(self.ControlTab)
+        self.label_4.setObjectName(u"label_4")
+
+        self.horizontalLayout_29.addWidget(self.label_4)
+
+        self.doubleSpinBox = QDoubleSpinBox(self.ControlTab)
+        self.doubleSpinBox.setObjectName(u"doubleSpinBox")
+        self.doubleSpinBox.setEnabled(False)
+
+        self.horizontalLayout_29.addWidget(self.doubleSpinBox)
+
+
+        self.verticalLayout_27.addLayout(self.horizontalLayout_29)
 
         self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -742,6 +773,23 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addLayout(self.verticalLayout_24)
 
+        self.verticalLayout_30 = QVBoxLayout()
+        self.verticalLayout_30.setObjectName(u"verticalLayout_30")
+        self.modbusTcpLabel = QLabel(self.groupBoxButton)
+        self.modbusTcpLabel.setObjectName(u"modbusTcpLabel")
+
+        self.verticalLayout_30.addWidget(self.modbusTcpLabel)
+
+        self.progressBar = QProgressBar(self.groupBoxButton)
+        self.progressBar.setObjectName(u"progressBar")
+        self.progressBar.setValue(100)
+        self.progressBar.setTextVisible(False)
+
+        self.verticalLayout_30.addWidget(self.progressBar)
+
+
+        self.verticalLayout_2.addLayout(self.verticalLayout_30)
+
         self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_2.addItem(self.verticalSpacer_5)
@@ -786,6 +834,7 @@ class Ui_MainWindow(object):
         self.numbersOfValvesLabel.setText(QCoreApplication.translate("MainWindow", u"Numbers of valves", None))
         self.conveyorSpeedlabel.setText(QCoreApplication.translate("MainWindow", u"Conveyor speed", None))
         self.timeOfShotValvelabel.setText(QCoreApplication.translate("MainWindow", u"Time of shot valve", None))
+        self.deltaTimeToShotlabel.setText(QCoreApplication.translate("MainWindow", u"Delta time to shot", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ValvesTab), QCoreApplication.translate("MainWindow", u"Valves", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.SignalsTab), QCoreApplication.translate("MainWindow", u"Signals", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.StatisticTab), QCoreApplication.translate("MainWindow", u"Statistic", None))
@@ -794,6 +843,7 @@ class Ui_MainWindow(object):
         self.resultingFrameRatelabel.setText(QCoreApplication.translate("MainWindow", u"Resulting Frame Rate(Fps)", None))
         self.cycleTimeCycleCnnlabel.setText(QCoreApplication.translate("MainWindow", u"Cycle time cycle CNN", None))
         self.cycleTimeCycleValve.setText(QCoreApplication.translate("MainWindow", u"Cycle time cycle valve", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Cycle time modbus", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ControlTab), QCoreApplication.translate("MainWindow", u"Control", None))
         self.statusBarLable.setText(QCoreApplication.translate("MainWindow", u"Status bar", None))
         self.valveImagelabel.setText(QCoreApplication.translate("MainWindow", u"ValveImage", None))
@@ -812,5 +862,6 @@ class Ui_MainWindow(object):
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Light control", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"On light", None))
         self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"Off light", None))
+        self.modbusTcpLabel.setText(QCoreApplication.translate("MainWindow", u"In/Out module control", None))
     # retranslateUi
 
