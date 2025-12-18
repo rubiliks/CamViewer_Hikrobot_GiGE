@@ -36,7 +36,7 @@
           <enum>QTabWidget::TabShape::Rounded</enum>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>2</number>
          </property>
          <property name="tabsClosable">
           <bool>false</bool>
@@ -454,7 +454,7 @@
                      <item>
                       <widget class="QLabel" name="lengthToValvesBlockLabel">
                        <property name="text">
-                        <string>Length to valves block</string>
+                        <string>Length to valves block, m</string>
                        </property>
                       </widget>
                      </item>
@@ -482,7 +482,7 @@
                      <item>
                       <widget class="QLabel" name="conveyorSpeedlabel">
                        <property name="text">
-                        <string>Conveyor speed</string>
+                        <string>Conveyor speed, m/s</string>
                        </property>
                       </widget>
                      </item>
@@ -496,7 +496,7 @@
                      <item>
                       <widget class="QLabel" name="timeOfShotValvelabel">
                        <property name="text">
-                        <string>Time of shot valve</string>
+                        <string>Time of shot valve, s</string>
                        </property>
                       </widget>
                      </item>
@@ -510,7 +510,7 @@
                      <item>
                       <widget class="QLabel" name="deltaTimeToShotlabel">
                        <property name="text">
-                        <string>Delta time to shot</string>
+                        <string>Delta time to shot, s</string>
                        </property>
                       </widget>
                      </item>

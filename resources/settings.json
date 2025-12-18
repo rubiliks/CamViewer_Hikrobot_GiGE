@@ -18,6 +18,9 @@
     },
     "Valve": {
         "valveTimeDelta": 0.05,
-        "valveTimeToOpen": 0.1
+        "valveTimeToOpen": 0.1,
+        "valvesConveyorSpeed": 2.53,
+        "valvesLengthToBlock": 1.21,
+        "valvesNumber": 80
     }
 }

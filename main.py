@@ -37,7 +37,7 @@ class WorkerThread(QThread):
     def run(self):
         self.test = True
         client = ModbusTcpClient(
-            host='192.168.6.150',  # IP-адрес устройства
+            host='192.168.88.150',  # IP-адрес устройства
             port=502,  # Стандартный порт Modbus TCP
             timeout=3,  # Таймаут в секундах
             retries=3  # Количество попыток переподключения
@@ -411,16 +411,19 @@ if __name__ == "__main__":
     hikCamera1.set_ReverseX(setting1.cameraSettingReverseX)
     ui.reverseXcheckBox.clicked.connect(hikCamera1.set_ReverseX)
 
-    # valve setting
+    # valve setting delta time
     ui.deltaTimeToShotdoubleSpinBox.setEnabled(True)
     ui.deltaTimeToShotdoubleSpinBox.setRange(-1.0,1.0)
     ui.deltaTimeToShotdoubleSpinBox.setValue(setting1.valveTimeDelta)
     ui.deltaTimeToShotdoubleSpinBox.valueChanged.connect(lambda:change_DeltaTimeToShot_setting(ui, setting1))
-
-    ui.timeOfShotValvedoubleSpinBox.setValue(True)
+    # valve time of shot
+    ui.timeOfShotValvedoubleSpinBox.setEnabled(True)
     ui.timeOfShotValvedoubleSpinBox.setRange(0.0,1.0)
     ui.timeOfShotValvedoubleSpinBox.setValue(setting1.valvesTimeOpen)
     ui.timeOfShotValvedoubleSpinBox.valueChanged.connect(lambda:change_valveTimeToOpen_setting(ui, setting1))
+    # leng to block
+    ui.lengthToValvesBlockSpinBox.setEnabled(True)
+    ui.lengthToValvesBlockSpinBox.setValue(setting1.valvesLengthToBlock)
 
 
 

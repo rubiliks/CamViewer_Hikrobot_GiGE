@@ -47,6 +47,9 @@ class Setting():
             self.cameraSettingReverseX = config['cameraSetting']['ReverseX']
             self.valveTimeDelta = config['Valve']['valveTimeDelta']
             self.valvesTimeOpen = config['Valve']['valveTimeToOpen']
+            self.valvesNumber = config['Valve']['valvesNumber']
+            self.valvesLengthToBlock = config['Valve']['valvesLengthToBlock']
+            self.valvesNumber = config['Valve']['valvesNumber']
 
     def write_setting_gain(self, gain_link):
         self.confige['cameraSetting']['gain'] = gain_link
