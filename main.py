@@ -121,6 +121,8 @@ def time_valve(hikcam_link1,objs_cnn_data1,setting1):
     objByTike.clear()
     for obj in objs_cnn_data1:
         if(obj["class_name"] != 'Ткань'):
+         #if(obj["class_name"] == 'Тетрапак'):
+          #if((obj["class_name"] == 'Бутылка PET белая') or (obj["class_name"] == 'Бутылка PET зеленая') or (obj["class_name"] == 'Бутылка PET темная') or (obj["class_name"] == 'Бутылка PET прозрач.масло подсолнечное') or (obj["class_name"] == 'Бутылка PET прозрач.голубой') or (obj["class_name"] == 'Бутылка PET термоусадка (мултиколор)')):
             #print('!@@#@#@#!#@',obj)
             #print(counterInt)
             counterInt = counterInt + 1
@@ -424,8 +426,6 @@ if __name__ == "__main__":
     # leng to block
     ui.lengthToValvesBlockSpinBox.setEnabled(True)
     ui.lengthToValvesBlockSpinBox.setValue(setting1.valvesLengthToBlock)
-
-
 
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)
