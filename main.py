@@ -116,7 +116,7 @@ def time_valve(hikcam_link1,objs_cnn_data1,setting1):
     counterInt = 0
     valvesStep =  setting1.valvesNumber/hikcam_link1.Width
     #print(valvesStep)
-    timeToOpen = setting1.valvesLengthToBlock/setting1.valvesConveyorSpeed
+    timeToOpen = setting1.valvesLengthToBlock/setting1.conveyerSpeed
     objByTike = []
     objByTike.clear()
     for obj in objs_cnn_data1:
@@ -305,6 +305,16 @@ def change_DeltaTimeToShot_setting(ui_link, setting_link):
 def change_valveTimeToOpen_setting(ui_link, setting_link):
     setting_link.write_setting_valvesTimeOpen(ui_link.timeOfShotValvedoubleSpinBox.value())
 
+def change_valvesLengthToBlock_setting(ui_link, setting_link):
+    setting_link.write_setting_valvesLengthToBlock(ui_link.lengthToValvesBlockdoubleSpinBox.value())
+
+def change_valvesNumber_setting(ui_link, setting_link):
+    setting_link.write_setting_valvesNumber(ui_link.numbersOfValvesSpinBox.value())
+
+def change_valveSpees_setting(ui_link, setting_link):
+    setting_link.write_setting_conveyerSpeed(ui_link.conveyorSpeeddoubleSpinBox.value())
+
+
 if __name__ == "__main__":
     logger.info("Start app")
     #Qt создание приложение
@@ -424,8 +434,20 @@ if __name__ == "__main__":
     ui.timeOfShotValvedoubleSpinBox.setValue(setting1.valvesTimeOpen)
     ui.timeOfShotValvedoubleSpinBox.valueChanged.connect(lambda:change_valveTimeToOpen_setting(ui, setting1))
     # leng to block
-    ui.lengthToValvesBlockSpinBox.setEnabled(True)
-    ui.lengthToValvesBlockSpinBox.setValue(setting1.valvesLengthToBlock)
+    ui.lengthToValvesBlockdoubleSpinBox.setEnabled(True)
+    ui.lengthToValvesBlockdoubleSpinBox.setRange(0.0,3.0)
+    ui.lengthToValvesBlockdoubleSpinBox.setValue(setting1.valvesLengthToBlock)
+    ui.lengthToValvesBlockdoubleSpinBox.valueChanged.connect(lambda:change_valvesLengthToBlock_setting(ui, setting1))
+    #valve number
+    ui.numbersOfValvesSpinBox.setEnabled(False)
+    ui.numbersOfValvesSpinBox.setRange(0,120)
+    ui.numbersOfValvesSpinBox.setValue(setting1.valvesNumber)
+    ui.numbersOfValvesSpinBox.valueChanged.connect(lambda:change_valvesNumber_setting(ui, setting1))
+    #conveyer Speed
+    ui.conveyorSpeeddoubleSpinBox.setEnabled(True)
+    ui.conveyorSpeeddoubleSpinBox.setRange(0.0,4.0)
+    ui.conveyorSpeeddoubleSpinBox.setValue(setting1.conveyerSpeed)
+    ui.conveyorSpeeddoubleSpinBox.valueChanged.connect(lambda:change_valveSpees_setting(ui, setting1))
 
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)
@@ -435,6 +457,7 @@ if __name__ == "__main__":
     ui.camFindLabel.setText('No Camera Find')
     ui.tabWidget.setCurrentWidget(ui.mainTab)
     logger.info("App started")
+
 
     app.aboutToQuit.connect(stop_and_close_thred)
 

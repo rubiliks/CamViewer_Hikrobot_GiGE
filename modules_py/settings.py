@@ -20,7 +20,7 @@ class Setting():
         self.cnnPath = ''
         self.valvesNumber = 80
         self.valvesLengthToBlock = 1.2
-        self.valvesConveyorSpeed = 2.53
+        self.conveyerSpeed = 2.53
         self.valvesTimeOpen = 0.25
         self.valveTimeDelta = 0.0
 
@@ -34,22 +34,23 @@ class Setting():
 
     def read_settings(self):
         with open(self.jsonSettingPath, 'r', encoding='utf-8') as file:
-            self.confige = config = json.load(file)
-            self.cameraSettingGain = config['cameraSetting']['gain']
-            self.cameraSettingExposureTime = config['cameraSetting']['exposureTime']
-            self.cameraSettingBalanceRed = config['cameraSetting']['BalanceRed']
-            self.cameraSettingBalanceGreen = config['cameraSetting']['BalanceGreen']
-            self.cameraSettingBalanceBlue = config['cameraSetting']['BalanceBlue']
-            self.cameraSettingWidth = config['cameraSetting']['Width']
-            self.cameraSettingHeight = config['cameraSetting']['Height']
-            self.cameraSettingOffsetX = config['cameraSetting']['OffsetX']
-            self.cnnPath = config['CnnSetting']['cnnPath']
-            self.cameraSettingReverseX = config['cameraSetting']['ReverseX']
-            self.valveTimeDelta = config['Valve']['valveTimeDelta']
-            self.valvesTimeOpen = config['Valve']['valveTimeToOpen']
-            self.valvesNumber = config['Valve']['valvesNumber']
-            self.valvesLengthToBlock = config['Valve']['valvesLengthToBlock']
-            self.valvesNumber = config['Valve']['valvesNumber']
+            self.confige = json.load(file)
+            self.cameraSettingGain = self.confige['cameraSetting']['gain']
+            self.cameraSettingExposureTime = self.confige['cameraSetting']['exposureTime']
+            self.cameraSettingBalanceRed = self.confige['cameraSetting']['BalanceRed']
+            self.cameraSettingBalanceGreen = self.confige['cameraSetting']['BalanceGreen']
+            self.cameraSettingBalanceBlue = self.confige['cameraSetting']['BalanceBlue']
+            self.cameraSettingWidth = self.confige['cameraSetting']['Width']
+            self.cameraSettingHeight = self.confige['cameraSetting']['Height']
+            self.cameraSettingOffsetX = self.confige['cameraSetting']['OffsetX']
+            self.cnnPath = self.confige['CnnSetting']['cnnPath']
+            self.cameraSettingReverseX = self.confige['cameraSetting']['ReverseX']
+            self.valveTimeDelta = self.confige['Valve']['valveTimeDelta']
+            self.valvesTimeOpen = self.confige['Valve']['valveTimeToOpen']
+            self.valvesNumber = self.confige['Valve']['valvesNumber']
+            self.valvesLengthToBlock = self.confige['Valve']['valvesLengthToBlock']
+            self.conveyerSpeed = self.confige['Valve']['conveyerSpeed']
+
 
     def write_setting_gain(self, gain_link):
         self.confige['cameraSetting']['gain'] = gain_link
@@ -98,5 +99,20 @@ class Setting():
 
     def write_setting_valvesTimeOpen(self, valvesTimeOpen_link):
         self.confige['Valve']['valveTimeToOpen'] = valvesTimeOpen_link
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
+
+    def write_setting_valvesLengthToBlock(self, valvesLengthToBlock_link):
+        self.confige['Valve']['valvesLengthToBlock'] = valvesLengthToBlock_link
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
+
+    def write_setting_valvesNumber(self, valvesNumber_link):
+        self.confige['Valve']['valvesNumber'] = valvesNumber_link
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
+
+    def write_setting_conveyerSpeed(self, valvesSpeed_link):
+        self.confige['Valve']['conveyerSpeed'] = valvesSpeed_link
         with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
             json.dump(self.confige, file, ensure_ascii=False, indent=4)

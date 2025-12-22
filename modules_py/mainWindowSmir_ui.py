@@ -383,10 +383,10 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_24.addWidget(self.lengthToValvesBlockLabel)
 
-        self.lengthToValvesBlockSpinBox = QSpinBox(self.scrollAreaWidgetContents)
-        self.lengthToValvesBlockSpinBox.setObjectName(u"lengthToValvesBlockSpinBox")
+        self.lengthToValvesBlockdoubleSpinBox = QDoubleSpinBox(self.scrollAreaWidgetContents)
+        self.lengthToValvesBlockdoubleSpinBox.setObjectName(u"lengthToValvesBlockdoubleSpinBox")
 
-        self.horizontalLayout_24.addWidget(self.lengthToValvesBlockSpinBox)
+        self.horizontalLayout_24.addWidget(self.lengthToValvesBlockdoubleSpinBox)
 
 
         self.verticalLayout_29.addLayout(self.horizontalLayout_24)
@@ -830,11 +830,11 @@ class Ui_MainWindow(object):
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Modbus IP ", None))
         self.settingPathlabel.setText(QCoreApplication.translate("MainWindow", u"Setting path:", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.SettingTab), QCoreApplication.translate("MainWindow", u"Settings", None))
-        self.lengthToValvesBlockLabel.setText(QCoreApplication.translate("MainWindow", u"Length to valves block", None))
+        self.lengthToValvesBlockLabel.setText(QCoreApplication.translate("MainWindow", u"Length to valves block, m", None))
         self.numbersOfValvesLabel.setText(QCoreApplication.translate("MainWindow", u"Numbers of valves", None))
-        self.conveyorSpeedlabel.setText(QCoreApplication.translate("MainWindow", u"Conveyor speed", None))
-        self.timeOfShotValvelabel.setText(QCoreApplication.translate("MainWindow", u"Time of shot valve", None))
-        self.deltaTimeToShotlabel.setText(QCoreApplication.translate("MainWindow", u"Delta time to shot", None))
+        self.conveyorSpeedlabel.setText(QCoreApplication.translate("MainWindow", u"Conveyor speed, m/s", None))
+        self.timeOfShotValvelabel.setText(QCoreApplication.translate("MainWindow", u"Time of shot valve, s", None))
+        self.deltaTimeToShotlabel.setText(QCoreApplication.translate("MainWindow", u"Delta time to shot, s", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ValvesTab), QCoreApplication.translate("MainWindow", u"Valves", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.SignalsTab), QCoreApplication.translate("MainWindow", u"Signals", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.StatisticTab), QCoreApplication.translate("MainWindow", u"Statistic", None))

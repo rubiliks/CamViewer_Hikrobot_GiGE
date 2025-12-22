@@ -36,7 +36,7 @@
           <enum>QTabWidget::TabShape::Rounded</enum>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>3</number>
          </property>
          <property name="tabsClosable">
           <bool>false</bool>
@@ -459,7 +459,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="lengthToValvesBlockSpinBox"/>
+                      <widget class="QDoubleSpinBox" name="lengthToValvesBlockdoubleSpinBox"/>
                      </item>
                     </layout>
                    </item>
