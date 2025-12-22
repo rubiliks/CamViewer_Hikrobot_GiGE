@@ -313,15 +313,15 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.label_3 = QLabel(self.AscrollAreaWidgetContents)
-        self.label_3.setObjectName(u"label_3")
+        self.modbusIPlabel = QLabel(self.AscrollAreaWidgetContents)
+        self.modbusIPlabel.setObjectName(u"modbusIPlabel")
 
-        self.horizontalLayout_3.addWidget(self.label_3)
+        self.horizontalLayout_3.addWidget(self.modbusIPlabel)
 
-        self.lineEdit = QLineEdit(self.AscrollAreaWidgetContents)
-        self.lineEdit.setObjectName(u"lineEdit")
+        self.modbusIPlineEdit = QLineEdit(self.AscrollAreaWidgetContents)
+        self.modbusIPlineEdit.setObjectName(u"modbusIPlineEdit")
 
-        self.horizontalLayout_3.addWidget(self.lineEdit)
+        self.horizontalLayout_3.addWidget(self.modbusIPlineEdit)
 
 
         self.verticalLayout_16.addLayout(self.horizontalLayout_3)
@@ -801,7 +801,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -827,7 +827,7 @@ class Ui_MainWindow(object):
         self.Cnn_path_lable.setText(QCoreApplication.translate("MainWindow", u"CNN Path:", None))
         self.cnnPathQlineEdit.setText(QCoreApplication.translate("MainWindow", u"./resources/EMG_2025_24_06_v1.engine", None))
         self.modbuslabel.setText(QCoreApplication.translate("MainWindow", u"Modbus TCP In/Out Setting", None))
-        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Modbus IP ", None))
+        self.modbusIPlabel.setText(QCoreApplication.translate("MainWindow", u"Modbus IP ", None))
         self.settingPathlabel.setText(QCoreApplication.translate("MainWindow", u"Setting path:", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.SettingTab), QCoreApplication.translate("MainWindow", u"Settings", None))
         self.lengthToValvesBlockLabel.setText(QCoreApplication.translate("MainWindow", u"Length to valves block, m", None))

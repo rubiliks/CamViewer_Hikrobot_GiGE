@@ -30,14 +30,14 @@ class WorkerThread(QThread):
         self.test = False
         self.data_list_recive = []
         self.data_list = []
-        self.bool_list = [False] * 80
-        self.bool_list_add = [False] * 80
+        self.bool_list = [False] * setting1.valvesNumber
+        self.bool_list_add = [False] * setting1.valvesNumber
         self.receive_list_signal.connect(self.process_list)
 
     def run(self):
         self.test = True
         client = ModbusTcpClient(
-            host='192.168.88.150',  # IP-адрес устройства
+            host=setting1.modbusInOutIp,  # IP-адрес устройства
             port=502,  # Стандартный порт Modbus TCP
             timeout=3,  # Таймаут в секундах
             retries=3  # Количество попыток переподключения
@@ -81,7 +81,7 @@ class WorkerThread(QThread):
 
             contervale = 0
             for vale in self.bool_list:
-                if vale == True and contervale > 1 and contervale <79:
+                if vale == True and contervale > 1 and contervale <(setting1.valvesNumber - 1):
                     self.bool_list_add[contervale] = True
                     self.bool_list_add[contervale + 1] = True
                     self.bool_list_add[contervale - 1] = True
@@ -314,6 +314,9 @@ def change_valvesNumber_setting(ui_link, setting_link):
 def change_valveSpees_setting(ui_link, setting_link):
     setting_link.write_setting_conveyerSpeed(ui_link.conveyorSpeeddoubleSpinBox.value())
 
+def change_modbus_settinf(ui_link, setting_link):
+    setting_link.write_setting_modbusInOutIp(ui_link.modbusIPlineEdit.text())
+
 
 if __name__ == "__main__":
     logger.info("Start app")
@@ -448,6 +451,10 @@ if __name__ == "__main__":
     ui.conveyorSpeeddoubleSpinBox.setRange(0.0,4.0)
     ui.conveyorSpeeddoubleSpinBox.setValue(setting1.conveyerSpeed)
     ui.conveyorSpeeddoubleSpinBox.valueChanged.connect(lambda:change_valveSpees_setting(ui, setting1))
+    #modbus IP
+    ui.modbusIPlineEdit.setEnabled(True)
+    ui.modbusIPlineEdit.setText(setting1.modbusInOutIp)
+    ui.modbusIPlineEdit.editingFinished.connect(lambda:change_modbus_settinf(ui, setting1))
 
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)
@@ -457,7 +464,6 @@ if __name__ == "__main__":
     ui.camFindLabel.setText('No Camera Find')
     ui.tabWidget.setCurrentWidget(ui.mainTab)
     logger.info("App started")
-
 
     app.aboutToQuit.connect(stop_and_close_thred)
 

@@ -23,6 +23,7 @@ class Setting():
         self.conveyerSpeed = 2.53
         self.valvesTimeOpen = 0.25
         self.valveTimeDelta = 0.0
+        self.modbusInOutIp = "192.168.88.150"
 
     def set_setting_path(self,SettingPath):
         p = Path(SettingPath)
@@ -50,6 +51,7 @@ class Setting():
             self.valvesNumber = self.confige['Valve']['valvesNumber']
             self.valvesLengthToBlock = self.confige['Valve']['valvesLengthToBlock']
             self.conveyerSpeed = self.confige['Valve']['conveyerSpeed']
+            self.modbusInOutIp = self.confige['modbusInOut']['ip']
 
 
     def write_setting_gain(self, gain_link):
@@ -116,3 +118,11 @@ class Setting():
         self.confige['Valve']['conveyerSpeed'] = valvesSpeed_link
         with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
             json.dump(self.confige, file, ensure_ascii=False, indent=4)
+
+    def write_setting_modbusInOutIp(self, ip_link):
+        self.confige['modbusInOut']['ip'] = ip_link
+        with open(self.jsonSettingPath, "w", encoding='utf-8') as file:
+            json.dump(self.confige, file, ensure_ascii=False, indent=4)
+
+
+
