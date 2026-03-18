@@ -1,12 +1,12 @@
 {
     "cameraSetting": {
         "gain": 22.0,
-        "exposureTime": 201,
+        "exposureTime": 200,
         "BalanceRed": 868,
         "BalanceGreen": 1024,
         "BalanceBlue": 1876,
-        "Width": 3136,
-        "Height": 1000,
+        "Width": 1024,
+        "Height": 4,
         "OffsetX": 250,
         "ReverseX": true
     },

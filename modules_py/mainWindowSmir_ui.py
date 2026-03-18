@@ -48,13 +48,18 @@ class Ui_MainWindow(object):
         self.tabWidget.setMovable(False)
         self.tabWidget.setTabBarAutoHide(False)
         self.mainTab = QWidget()
+        self.mainTab.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum))
+
         self.mainTab.setObjectName(u"mainTab")
         self.verticalLayout_5 = QVBoxLayout(self.mainTab)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.CameraLabel = QLabel(self.mainTab)
         self.CameraLabel.setObjectName(u"CameraLabel")
         self.CameraLabel.setEnabled(True)
-        self.CameraLabel.setMinimumSize(QSize(720, 540))
+        self.CameraLabel.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum))
+        self.CameraLabel.setMinimumSize(QSize(320, 4))
+
+
         self.CameraLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_5.addWidget(self.CameraLabel)

@@ -1,3 +1,5 @@
+import datetime
+
 import cv2
 import numpy as np
 from PySide6.QtGui import QImage, QPixmap
@@ -33,7 +35,7 @@ class WorkerThread(QThread):
         self.bool_list = [False] * setting1.valvesNumber
         self.bool_list_add = [False] * setting1.valvesNumber
         self.receive_list_signal.connect(self.process_list)
-
+        self.ui = Ui_MainWindow()
     def run(self):
         self.test = True
         client = ModbusTcpClient(
@@ -153,9 +155,20 @@ def time_valve(hikcam_link1,objs_cnn_data1,setting1):
     return objByTike
 
 def update_frame(hikcam_link,cnnyolo_link,lable_link,setting_link):
+
+    start_time = datetime.datetime.now()
     lable_frame = hikcam_link.get_one_frame()
+    end_time = datetime.datetime.now()
+    diff = end_time - start_time
+    print("diff",diff)
+
+
     lable_detection,objs_cnn_data = cnnyolo_link.object_detection(lable_frame)
+
     lable_link.setPixmap(lable_detection)
+
+
+    print("lable_link size",lable_link.height(),lable_link.width())
     objByTikeFrame = []
     objByTikeFrame.clear()
     objByTikeFrame = time_valve(hikcam_link,objs_cnn_data,setting_link).copy()
@@ -164,6 +177,8 @@ def update_frame(hikcam_link,cnnyolo_link,lable_link,setting_link):
         #print('objValveArray',objByTikeFrame)
         #print('sizeOfobjValveArray',len(objByTikeFrame_link))
     #print('frame',hikcam_link.ResultingFrame)
+
+
 
 def update_ui_bool_display(data, ui_reference=None,setting_link=None):
     imageValve = np.zeros((30, 1600, 3), dtype=np.uint8)
@@ -317,6 +332,10 @@ def change_valveSpees_setting(ui_link, setting_link):
 def change_modbus_settinf(ui_link, setting_link):
     setting_link.write_setting_modbusInOutIp(ui_link.modbusIPlineEdit.text())
 
+def set_ui_frame_rate(value,ui_link):
+    ui_link.resultingFrameRatedoubleSpinBox.setValue(value)
+    print("FPS:",value)
+
 
 if __name__ == "__main__":
     logger.info("Start app")
@@ -455,13 +474,16 @@ if __name__ == "__main__":
     ui.modbusIPlineEdit.setEnabled(True)
     ui.modbusIPlineEdit.setText(setting1.modbusInOutIp)
     ui.modbusIPlineEdit.editingFinished.connect(lambda:change_modbus_settinf(ui, setting1))
-
     # Соединение состояния камеры с блокировкой кнопок
     ui.pushButtonConnectCam.setEnabled(False)
     hikCamera1.cam_сon_discon_sig.connect(lambda:cam_status_block_button_ui(ui))
     hikCamera1.cam_finded_camera_sig.connect(lambda:cam_status_block_serch_came(ui))
     hikCamera1.cam_not_finded_sig.connect(lambda:cam_status_not_find_came(ui))
+
+    hikCamera1.cam_get_frame_rate_sig.connect(lambda fps: set_ui_frame_rate(fps,ui))
+
     ui.camFindLabel.setText('No Camera Find')
+
     ui.tabWidget.setCurrentWidget(ui.mainTab)
     logger.info("App started")
 

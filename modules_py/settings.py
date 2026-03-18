@@ -13,8 +13,8 @@ class Setting():
         self.cameraSettingBalanceGreen = 1024
         self.cameraSettingBalanceBlue = 1957
         self.cameraSettingWidth = 4096
-        self.cameraSettingHeight = 1000
-        self.cameraSettingOffsetX = 100
+        self.cameraSettingHeight = 10
+        self.cameraSettingOffsetX = 4
         self.cameraSettingReverseX = False
         self.confige = ''
         self.cnnPath = ''

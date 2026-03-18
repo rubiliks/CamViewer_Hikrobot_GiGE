@@ -12,6 +12,8 @@ class HikCam(QObject):
     cam_сon_discon_sig = Signal()
     cam_finded_camera_sig = Signal()
     cam_not_finded_sig = Signal()
+    cam_get_frame_rate_sig = Signal(float, None)
+
     def __init__(self):
         super().__init__()
         self.cam = MvCamera()
@@ -258,6 +260,7 @@ class HikCam(QObject):
         else:
             self.ResultingFrame = stFloatValue.fCurValue
             logger.info(f"get ResultingFrameRate {self.ResultingFrame}")
+            self.cam_get_frame_rate_sig.emit(self.ResultingFrame, None)
 
         #Get cam Resulting Resulting Line Rate(Hz)
         stIntValue = MVCC_INTVALUE()
@@ -309,6 +312,8 @@ class HikCam(QObject):
             ctypes.memmove(ctypes.byref(img_buff), stConvertParam.pDstBuffer, stConvertParam.nDstLen) # копирование данных
             img_buff = np.frombuffer(img_buff, count=int(stConvertParam.nDstBufferSize),  # преобразование в np массив
                                      dtype=np.uint8)  # data以流的形式读入转化成ndarray对象
+            print("Height", stOutFrame.stFrameInfo.nHeight)
+            print("nWidth", stOutFrame.stFrameInfo.nWidth)
             img_buff = img_buff.reshape(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, 3)
             nRet = self.cam.MV_CC_FreeImageBuffer(stOutFrame)
             if ret != 0:
